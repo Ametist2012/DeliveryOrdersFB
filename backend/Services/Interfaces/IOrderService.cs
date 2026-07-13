@@ -1,7 +1,8 @@
 using DeliveryOrders.Models;
 using DeliveryOrders.DTOs;
 
-namespace DeliveryOrders.Services;
+
+namespace DeliveryOrders.Services.Interfaces;
 
 public interface IOrderService
 {

@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using DeliveryOrders.DTOs;
-using DeliveryOrders.Services;
+using DeliveryOrders.Services.Interfaces;
 using DeliveryOrders.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryOrders.Controllers;
 
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase

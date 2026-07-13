@@ -1,0 +1,72 @@
+using System.Threading.Tasks;
+using DeliveryOrders.Data;
+using DeliveryOrders.Models;
+using DeliveryOrders.Models.Enums;
+using DeliveryOrders.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace DeliveryOrders.Repositories;
+
+public class UserRepository : IUserRepository
+
+{
+
+    private readonly AppDbContext _db;
+
+    public UserRepository(AppDbContext db) { _db = db; }
+
+    // получить пользователя по id
+    public async Task<User?> GetByIdAsync(Guid id)
+    {
+        return _db.Users.FirstOrDefault(u => u.Id == id);
+    }
+
+    // получить по email
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return _db.Users.FirstOrDefault(u => u.Email == email);
+    }
+
+    // проверить существует ли пользователь
+    public async Task<bool> ExistsAsync(Guid id)
+    {
+        return _db.Users.Any(u => u.Id == id);
+    }
+
+    // проверка email
+    public async Task<bool> EmailExistsAsync(string email)
+    {
+        return _db.Users.Any(e => e.Email == email);
+    }
+
+    // получить всех пользователей
+    public async Task<List<User>> GetAllAsync()
+    {
+        return _db.Users.ToList();
+    }
+
+    // только админы
+    public async Task<List<User>> GetAdminsAsync()
+    {
+        return _db.Users
+            .Where(u => u.Role == Role.Admin.ToString())
+            .ToList();
+    }
+
+    // добавить пользователя
+    public async Task AddAsync(User user)
+    {
+        _db.Users.Add(user);
+    }
+
+    public async Task DeleteAsync(User user)
+    {
+        _db.Users.Remove(user);
+    }
+
+    // сохранить изменения
+    public async Task SaveChangesAsync()
+    {
+        _db.SaveChanges();
+    }
+}

@@ -1,6 +1,6 @@
 using DeliveryOrders.Models;
 
-namespace DeliveryOrders.Repositories;
+namespace DeliveryOrders.Repositories.Interfaces;
 
 public interface IOrderRepository
 {
