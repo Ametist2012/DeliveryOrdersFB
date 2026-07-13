@@ -6,7 +6,6 @@ using DeliveryOrders.Services;
 using DeliveryOrders.Validators;
 using DeliveryOrders.Middleware;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -43,7 +42,8 @@ builder.Services.AddScoped<IOrderValidator, OrderValidator>();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors("FrontendPolicy");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
