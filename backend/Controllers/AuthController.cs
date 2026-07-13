@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using DeliveryOrders.Services;
 using DeliveryOrders.DTOs.Auth;
 using System.Threading.Tasks;
+using DeliveryOrders.Validators;
+using DeliveryOrders.Validators.Interfaces;
 
 namespace DeliveryOrders.Controllers;
 
@@ -12,14 +14,30 @@ namespace DeliveryOrders.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AuthService _authService;
-    public AuthController(AuthService authService) { _authService = authService; }
-
+    private readonly IUserRegisterValidator _validator;
+    private readonly IUserLoginValidator _loginValidator;
+    public AuthController(AuthService authService,
+        IUserRegisterValidator validator,
+        IUserLoginValidator loginValidator) 
+            { _authService = authService;
+              _validator = validator;
+              _loginValidator = loginValidator; }
 
 
     [AllowAnonymous] //Доступны без авторизации
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
+        var errors = _validator.Validate(request);
+        if(errors.Count > 0) 
+        {   foreach(var error in errors)
+            { 
+                foreach(var message in error.Value)
+                    { ModelState.AddModelError(error.Key,message);}
+            }
+            return ValidationProblem(ModelState);
+        }
+
         var success = await _authService.Register(request);
         if (!success)
         {
@@ -37,6 +55,16 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
+        var errors = _loginValidator.Validate(request);
+        if(errors.Count > 0) 
+        {   foreach(var error in errors)
+            { 
+                foreach(var message in error.Value)
+                    { ModelState.AddModelError(error.Key,message);}
+            }
+            return ValidationProblem(ModelState);
+        }
+
         var token = await _authService.Login(request);
         if (token == null)
         {

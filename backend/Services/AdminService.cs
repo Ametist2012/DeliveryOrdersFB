@@ -3,6 +3,7 @@ using DeliveryOrders.Models.Enums;
 using DeliveryOrders.Models;
 using DeliveryOrders.Repositories.Interfaces;
 using System.Threading.Tasks;
+using DeliveryOrders.DTOs.Auth;
 
 namespace DeliveryOrders.Services;
 
@@ -26,5 +27,25 @@ public class AdminService
         await _userRepository.DeleteAsync(curUser);
         await _userRepository.SaveChangesAsync();
             return true;
+    }
+
+    public async Task<bool> AddUserAsync(AdminRegisterRequest request)
+    {
+        var userExists = await _userRepository.GetByEmailAsync(request.Email);
+        if (userExists != null) return false;
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            Email = request.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Role = request.Role
+        };
+
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
+
+            return true;    
     }
 }

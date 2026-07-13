@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using DeliveryOrders.Services;
 using Microsoft.AspNetCore.Authorization;
-//using DeliveryOrders.DTOs.Auth;
-//using System.Threading.Tasks;
+using DeliveryOrders.DTOs.Auth;
+using DeliveryOrders.Validators;
 
 namespace DeliveryOrders.Controllers;
 
@@ -11,8 +11,12 @@ namespace DeliveryOrders.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly AdminService _adminService;
+    private readonly IAdminRegisterValidator _validator;
 
-    public AdminController(AdminService adminService) { _adminService = adminService; }
+    public AdminController(AdminService adminService,
+            IAdminRegisterValidator validator) 
+            { _adminService = adminService;
+              _validator = validator; }
 
 
 
@@ -38,5 +42,30 @@ public class AdminController : ControllerBase
         }
         return Ok(new { message = "User deleted successfully",
                         userId });
+    }
+
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("users")]
+    public async Task<IActionResult> RegUser(AdminRegisterRequest request)
+    {
+        var errors = _validator.Validate(request);
+        if(errors.Count > 0) 
+        {   foreach(var error in errors)
+            { 
+                foreach(var message in error.Value)
+                    { ModelState.AddModelError(error.Key,message);}
+            }
+            return ValidationProblem(ModelState);
+        }
+
+        var result = await _adminService.AddUserAsync(request);
+        if (!result)
+        {
+            return Problem( title: "Registration User failed",
+                            detail: "A user with this email already exists.",
+                            statusCode: StatusCodes.Status400BadRequest);
+        }
+            return Ok(new {message = "User registered successfully"});
     }
 }

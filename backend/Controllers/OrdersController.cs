@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using DeliveryOrders.DTOs;
 using DeliveryOrders.Services.Interfaces;
-using DeliveryOrders.Validators;
+using DeliveryOrders.Validators.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryOrders.Controllers;
