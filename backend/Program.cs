@@ -4,7 +4,8 @@ using DeliveryOrders.Data;
 using DeliveryOrders.Repositories;
 using DeliveryOrders.Services;
 using DeliveryOrders.Validators;
-using DeliveryOrders.Api.Middleware;
+using DeliveryOrders.Middleware;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IOrderValidator, OrderValidator>();  
 
+
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -56,6 +59,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//app.UseAuthentication(); //используется для аунтификации(проверки токена)
 app.UseAuthorization();
 app.MapControllers();
 
