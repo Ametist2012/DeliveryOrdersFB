@@ -1,52 +1,54 @@
-
-# **🐘 База данных**
+# **🐘 База данных PostgreSQL**
 
 В проекте используется:
 
 - **PostgreSQL**
-- запуск через **Docker Compose**
+- **Docker Compose** для запуска базы данных в контейнере
+- **Entity Framework Core** для работы с базой данных и миграциями
 
-Конфигурация базы данных находится /backend/ в файле:
+Конфигурация PostgreSQL находится в файле:
 
 ```text
-docker-compose.yml
+backend/docker-compose.yml
 ```
 
 После запуска Docker автоматически создается контейнер PostgreSQL.
 
 ---
 
-# **🐳 Запуск Docker**
+# **🐳 Запуск PostgreSQL**
 
-Перейти в backend проекта:
+Перейдите в папку backend:
 
 ```bash
 cd DeliveryOrders/backend
 ```
 
-Запустить PostgreSQL:
+Запустите контейнер:
 
 ```bash
 docker compose up -d
 ```
 
-Проверить запущенные контейнеры:
+Проверьте, что контейнер успешно запущен:
 
 ```bash
 docker ps
 ```
 
-Остановка контейнеров:
+Остановить контейнеры:
 
 ```bash
 docker compose down
 ```
 
+**Примечание:** если используется Docker Volume, данные базы сохранятся даже после выполнения `docker compose down`.
+
 ---
 
-# **⚙️ Настройка подключения к базе**
+# **⚙️ Настройка подключения**
 
-Строка подключения находится в:
+Строка подключения находится в файле:
 
 ```text
 backend/appsettings.json
@@ -57,16 +59,111 @@ backend/appsettings.json
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": 
-    "Host=localhost;Port=5410;Database=delivery_orders;Username=admin;Password=admin"
+    "DefaultConnection": "Host=localhost;Port=5410;Database=deliveryorders;Username=admin;Password=admin"
   }
 }
 ```
 
-Параметры должны совпадать с настройками в:
+Параметры строки подключения должны соответствовать настройкам, указанным в:
 
 ```text
-docker-compose.yml
+backend/docker-compose.yml
+```
+
+Например:
+
+- Host
+- Port
+- Database
+- Username
+- Password
+
+---
+
+# **🗄️ Применение миграций**
+
+После первого запуска PostgreSQL необходимо создать структуру базы данных.
+
+Выполните команду:
+
+```bash
+dotnet ef database update
+```
+
+Entity Framework Core автоматически:
+
+- создаст базу данных (если она отсутствует);
+- применит все существующие миграции;
+- создаст необходимые таблицы.
+
+При изменении моделей данных создайте новую миграцию:
+
+```bash
+dotnet ef migrations add MigrationName
+```
+
+После этого снова примените изменения:
+
+```bash
+dotnet ef database update
 ```
 
 ---
+
+# **💻 Подключение к PostgreSQL через терминал**
+
+Подключиться к базе данных внутри контейнера можно командой:
+
+```bash
+docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
+```
+
+После подключения становятся доступны стандартные команды PostgreSQL.
+
+Например:
+
+Показать список таблиц:
+
+```sql
+\dt
+```
+
+Описание таблицы:
+
+```sql
+\d Orders
+```
+
+Выход из консоли PostgreSQL:
+
+```sql
+\q
+```
+
+---
+
+# **🚀 Первый запуск проекта**
+
+После клонирования репозитория выполните следующие команды:
+
+```bash
+cd DeliveryOrders/backend
+
+docker compose up -d
+
+dotnet restore
+
+dotnet ef database update
+
+dotnet run
+```
+
+После этого:
+
+- PostgreSQL будет запущен;
+- структура базы данных будет создана;
+- API станет доступно для работы.  
+
+---
+
+
