@@ -1,4 +1,4 @@
-namespace DeliveryOrders.Api.Middleware;
+namespace DeliveryOrders.Middleware;
 
 public class ExceptionHandlingMiddleware
 {

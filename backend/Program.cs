@@ -4,7 +4,7 @@ using DeliveryOrders.Data;
 using DeliveryOrders.Repositories;
 using DeliveryOrders.Services;
 using DeliveryOrders.Validators;
-using DeliveryOrders.Api.Middleware;
+using DeliveryOrders.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,9 +38,23 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IOrderValidator, OrderValidator>();  
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors("FrontendPolicy");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
