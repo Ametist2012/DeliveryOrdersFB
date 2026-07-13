@@ -1,34 +1,128 @@
-# **Delivery Orders — Frontend**
+# **Delivery Orders**
 
-Клиентская часть приложения для создания и просмотра заказов на доставку.
+Веб-приложение для создания и просмотра заказов на доставку.
 
-## **Технологии**
+Проект состоит из:
+
+- **Backend** — ASP.NET Core Web API
+- **Frontend** — React + TypeScript
+- **Database** — PostgreSQL в Docker-контейнере
+
+---
+
+# **Технологии**
+
+## **Backend**
+
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL
+- Docker Compose
+- Swagger && OpenAPI
+
+## **Frontend**
 
 - React 19
 - TypeScript
 - Vite
 - Fetch API
-- CSS3
+- Modern CSS (CSS Variables, Flexbox, Grid)
 
 ---
 
-## **Требования**
+# **Требования**
 
-Перед запуском убедитесь, что установлены:
+Перед запуском необходимо установить:
 
-- Node.js 24+ 
+- .NET SDK 9
+- Node.js 24+
 - npm 24+
+- Docker Desktop
 
-Проверить версии:
+Проверка версий:
 
 ```bash
+dotnet --version
 node -v
 npm -v
+docker --version
 ```
 
 ---
 
-## **Установка зависимостей**
+# **Запуск проекта**
+
+## **1. Запуск PostgreSQL**
+
+Перейдите в папку backend:
+
+```bash
+cd backend
+```
+
+Запустите контейнер базы данных:
+
+```bash
+docker compose up -d
+```
+
+Проверить состояние контейнера:
+
+```bash
+docker ps
+```
+
+Остановить контейнер:
+
+```bash
+docker compose down
+```
+
+---
+
+# **2. Настройка Backend**
+
+Перейдите в папку backend:
+
+```bash
+cd backend
+```
+
+Установите зависимости:
+
+```bash
+dotnet restore
+```
+
+Примените миграции базы данных:
+
+```bash
+dotnet ef database update
+```
+
+Запустите API:
+
+```bash
+dotnet run
+```
+
+После запуска Backend будет доступен:
+
+```
+http://localhost:5056
+```
+
+Swagger UI:
+
+```
+http://localhost:5056/swagger
+```
+
+---
+
+# **3. Запуск Frontend**
+
+Откройте новый терминал.
 
 Перейдите в папку frontend:
 
@@ -42,82 +136,36 @@ cd frontend
 npm install
 ```
 
----
-
-## **Запуск приложения**
-
-Запустите development-сервер:
+Запустите приложение:
 
 ```bash
 npm run dev
 ```
 
-После запуска приложение будет доступно по адресу:
+Frontend будет доступен:
 
-```text
+```
 http://localhost:5173
 ```
 
 ---
 
-## **Backend**
+# **Основной функционал**
 
-Перед запуском frontend необходимо запустить Backend API.
+Приложение позволяет:
 
-Backend/README.md
-
----
-
-## **Доступные команды**
-
-Установить зависимости:
-
-```bash
-npm install
-```
-
-Запустить приложение:
-
-```bash
-npm run dev
-```
-
-Собрать production-версию:
-
-```bash
-npm run build
-```
-
-Просмотреть production-сборку локально:
-
-```bash
-npm run preview
-```
-
-Проверить код линтером:
-
-```bash
-npm run lint
-```
+- создавать новые заказы доставки;
+- автоматически получать номер заказа от сервера;
+- просматривать список созданных заказов;
+- открывать детальную информацию о заказе;
+- выполнять клиентскую и серверную валидацию данных;
+- отображать ошибки заполнения формы.
 
 ---
 
-## **Основной функционал**
+# **API**
 
-- создание нового заказа;
-- просмотр списка заказов;
-- просмотр детальной информации о заказе;
-- клиентская и серверная валидация формы;
-- отображение сообщений об ошибках;
-- адаптивный интерфейс.
-
----
-
-## **Используемый Backend**
-
-Frontend взаимодействует с ASP.NET Core Web API.
-
-Основные REST-эндпоинты:
+Основные REST endpoints:
 
 |**Метод**|**Endpoint**|**Назначение**|
 |---|---|---|
@@ -126,16 +174,130 @@ Frontend взаимодействует с ASP.NET Core Web API.
 
 ---
 
-## **Разработка**
+# **Команды разработки**
 
-После изменения исходного кода приложение автоматически перезагружается благодаря Vite Hot Module Replacement (HMR).
+## **Backend**
 
-В production рекомендуется использовать команду:
+Запуск:
+
+```bash
+dotnet run
+```
+
+Создание миграции:
+
+```bash
+dotnet ef migrations add MigrationName
+```
+
+Применение миграций:
+
+```bash
+dotnet ef database update
+```
+
+---
+
+## **Frontend**
+
+Запуск:
+
+```bash
+npm run dev
+```
+
+Production сборка:
 
 ```bash
 npm run build
 ```
 
+Предпросмотр production:
+
+```bash
+npm run preview
+```
+
+Проверка качества кода:
+
+```bash
+npm run lint
+```
 
 ---
 
+# **Подключение к PostgreSQL**
+
+Настройки подключения находятся в:
+
+```
+backend/appsettings.json
+```
+
+Пример:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5410;Database=deliveryorders;Username=admin;Password=admin"
+  }
+}
+```
+
+Параметры должны совпадать с настройками:
+
+```
+backend/docker-compose.yml
+```
+
+---
+
+# **Проверка базы данных**
+
+Подключение к PostgreSQL внутри контейнера:
+
+```bash
+docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
+```
+
+Список таблиц:
+
+```sql
+\dt
+```
+
+Выход:
+
+```sql
+\q
+```
+
+---
+
+# **Полный порядок первого запуска**
+
+После клонирования проекта:
+
+```bash
+cd DeliveryOrders/backend
+
+docker compose up -d
+
+dotnet restore
+
+dotnet ef database update
+
+dotnet run
+```
+
+В новом терминале:
+
+```bash
+cd DeliveryOrders/frontend
+
+npm install
+
+npm run dev
+```
+
+После выполнения этих шагов приложение готово к работе.
