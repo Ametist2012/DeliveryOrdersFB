@@ -42,8 +42,6 @@ builder.Services.AddScoped<IOrderValidator, OrderValidator>();
 
 var app = builder.Build();
 
-app.UseCors("FrontendPolicy");
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
