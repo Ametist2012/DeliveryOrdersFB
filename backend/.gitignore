@@ -1,0 +1,49 @@
+## .NET / ASP.NET Core
+
+# Сборка
+bin/
+obj/
+out/
+
+# VS Code
+.vscode/
+
+# Логи и временные файлы
+*.log
+*.tmp
+logs/
+
+# Публикация
+publish/
+PublishProfiles/*.user
+
+# Секреты и конфиги окружения
+#appsettings.Development.json
+#appsettings.*.local.json
+#secrets.json
+*.pfx
+*.env
+.env
+
+# EF Core
+*.dbmdl
+*.jfm
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+.nuget/
+
+# Тестовые артефакты
+TestResults/
+coverage/
+*.trx
+
+# macOS / Windows системные файлы
+.DS_Store
+Thumbs.db
+
+# .NET tools
+.dotnet/
