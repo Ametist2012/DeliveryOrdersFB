@@ -38,6 +38,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IOrderValidator, OrderValidator>();  
 
+
+
 var app = builder.Build();
 
 
@@ -55,6 +57,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//app.UseAuthentication(); //используется для аунтификации(проверки токена)
 app.UseAuthorization();
 app.MapControllers();
 
