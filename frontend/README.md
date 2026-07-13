@@ -1,75 +1,141 @@
-# React + TypeScript + Vite
+# **Delivery Orders — Frontend**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Клиентская часть приложения для создания и просмотра заказов на доставку.
 
-Currently, two official plugins are available:
+## **Технологии**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript
+- Vite
+- Fetch API
+- CSS3
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## **Требования**
 
-## Expanding the ESLint configuration
+Перед запуском убедитесь, что установлены:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js 24+ 
+- npm 24+
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Проверить версии:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+node -v
+npm -v
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## **Установка зависимостей**
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Перейдите в папку frontend:
 
+```bash
+cd frontend
 ```
+
+Установите зависимости:
+
+```bash
+npm install
+```
+
+---
+
+## **Запуск приложения**
+
+Запустите development-сервер:
+
+```bash
+npm run dev
+```
+
+После запуска приложение будет доступно по адресу:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## **Backend**
+
+Перед запуском frontend необходимо запустить Backend API.
+
+Backend/README.md
+
+---
+
+## **Доступные команды**
+
+Установить зависимости:
+
+```bash
+npm install
+```
+
+Запустить приложение:
+
+```bash
+npm run dev
+```
+
+Собрать production-версию:
+
+```bash
+npm run build
+```
+
+Просмотреть production-сборку локально:
+
+```bash
+npm run preview
+```
+
+Проверить код линтером:
+
+```bash
+npm run lint
+```
+
+---
+
+## **Основной функционал**
+
+- создание нового заказа;
+- просмотр списка заказов;
+- просмотр детальной информации о заказе;
+- клиентская и серверная валидация формы;
+- отображение сообщений об ошибках;
+- адаптивный интерфейс.
+
+---
+
+## **Используемый Backend**
+
+Frontend взаимодействует с ASP.NET Core Web API.
+
+Основные REST-эндпоинты:
+
+|**Метод**|**Endpoint**|**Назначение**|
+|---|---|---|
+|GET|`/api/orders`|Получение списка заказов|
+|POST|`/api/orders`|Создание нового заказа|
+
+---
+
+## **Разработка**
+
+После изменения исходного кода приложение автоматически перезагружается благодаря Vite Hot Module Replacement (HMR).
+
+В production рекомендуется использовать команду:
+
+```bash
+npm run build
+```
+
+
+---
+
