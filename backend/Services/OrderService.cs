@@ -1,6 +1,8 @@
 using DeliveryOrders.Models;
 using DeliveryOrders.Repositories;
 using DeliveryOrders.DTOs;
+using DeliveryOrders.Repositories.Interfaces;
+using DeliveryOrders.Services.Interfaces;
 
 namespace DeliveryOrders.Services;
 

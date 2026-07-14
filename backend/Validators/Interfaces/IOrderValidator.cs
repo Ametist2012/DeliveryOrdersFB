@@ -1,6 +1,6 @@
 using DeliveryOrders.DTOs;
 
-namespace DeliveryOrders.Validators;
+namespace DeliveryOrders.Validators.Interfaces;
 
 public interface IOrderValidator
 {
