@@ -10,7 +10,7 @@ export default function OrderDetail({ order, onBack }: { order: Order; onBack: (
       </button>
       <div className="detail-card">
         <div className="detail-header">
-          <div className="detail-stamp">ПРИНЯТО</div>
+          <div className="detail-stamp">ОФОРМЛЕН</div>
           <div className="detail-eyebrow">№ заказа</div>
           <div className="detail-number">{order.orderNumber}</div>
           <div className="detail-route">

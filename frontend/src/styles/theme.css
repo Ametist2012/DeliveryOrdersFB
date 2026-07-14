@@ -21,7 +21,6 @@ button {
   color: inherit;
   -webkit-tap-highlight-color: transparent;
 }
-button:hover { background-color: inherit; }
 
 body {
   margin: 0;
@@ -214,7 +213,98 @@ body {
 
 .status-banner { border-radius: 8px; padding: 14px 16px; font-size: 13.5px; margin-top: 24px; }
 .status-banner--error { background: #f6e6e1; color: var(--danger); border: 1px solid #e2b7a9; }
+.status-banner--info { background: var(--paper-dim); color: var(--slate); border: 1px solid var(--line); }
 .status-banner--loading { color: var(--slate); font-family: "IBM Plex Mono", monospace; font-size: 12px; margin-top: 24px; }
+
+/* --- Auth --- */
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.auth-brand-title { font-weight: 700; font-size: 18px; color: var(--ink); }
+.auth-brand-subtitle {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--slate); margin-top: 2px;
+}
+.auth-shell .form-card { width: 100%; max-width: 380px; margin-top: 0; }
+.auth-shell .status-banner--info { width: 100%; max-width: 380px; margin-bottom: 16px; margin-top: 0; }
+.auth-switch { margin-top: 20px; font-size: 13px; color: var(--slate); text-align: center; }
+.auth-switch-link { background: none; border: none; color: var(--signal-dark); font-weight: 600; cursor: pointer; padding: 0; font-size: 13px; }
+.auth-switch-link:hover { color: var(--signal); }
+
+.topbar-left { display: flex; align-items: center; gap: 24px; }
+.topbar-tabs { display: flex; gap: 4px; }
+.topbar-tab {
+  background: none; border: none; color: rgba(255, 255, 255, 0.6); font-size: 13px;
+  font-weight: 500; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+.topbar-tab:hover { color: #fff; }
+.topbar-tab.topbar-tab--active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+@media (max-width: 640px) { .topbar-tabs { display: none; } }
+
+.topbar-user {
+  color: rgba(255, 255, 255, 0.75); font-family: "IBM Plex Mono", monospace; font-size: 11px;
+}
+@media (max-width: 640px) { .topbar-user { display: none; } }
+.topbar-logout {
+  background: none; border: 1px solid rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.85);
+  font-size: 12px; padding: 7px 12px; border-radius: 6px; cursor: pointer;
+}
+.topbar-logout:hover { border-color: var(--signal); color: #fff; }
+
+/* --- Admin panel --- */
+.admin-list {
+  margin-top: 20px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--paper); overflow: hidden;
+}
+.admin-list-head {
+  display: grid; grid-template-columns: 1fr 1fr 90px 90px; gap: 16px; padding: 10px 20px;
+  border-bottom: 1px solid var(--line); background: var(--paper-dim);
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--slate);
+}
+.admin-row {
+  display: grid; grid-template-columns: 1fr 1fr 90px 90px; gap: 16px; align-items: center;
+  padding: 14px 20px; border-bottom: 1px solid var(--line);
+}
+.admin-row:last-child { border-bottom: none; }
+.admin-row-name { font-family: "Archivo", sans-serif; font-weight: 600; font-size: 14px; color: var(--ink); }
+.admin-row-email {
+  font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--slate);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.role-badge {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px;
+  width: fit-content;
+}
+.role-badge--admin { background: rgba(232, 137, 12, 0.15); color: var(--signal-dark); }
+.role-badge--user { background: var(--paper-dim); color: var(--slate); border: 1px solid var(--line); }
+
+.admin-row-delete {
+  background: none; border: 1px solid var(--line); color: var(--danger); font-size: 12px;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; justify-self: end; font-family: inherit;
+}
+.admin-row-delete:hover { background: #f6e6e1; border-color: #e2b7a9; }
+.admin-row-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .admin-list-head { display: none; }
+  .admin-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "name delete" "email delete" "role role";
+    row-gap: 6px;
+  }
+  .admin-row-name { grid-area: name; }
+  .admin-row-email { grid-area: email; }
+  .role-badge { grid-area: role; }
+  .admin-row-delete { grid-area: delete; align-self: start; }
+}
 
 /* --- Form --- */
 .form-card { border-radius: 10px; padding: 24px; margin-top: 24px; background: var(--paper); border: 1px solid var(--line); }

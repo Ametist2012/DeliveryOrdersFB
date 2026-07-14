@@ -1,54 +1,70 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import TopBar from "./components/TopBar";
-import OrderList from "./components/OrderList";
-import OrderForm from "./components/OrderForm";
-import OrderDetail from "./components/OrderDetail";
-import { getOrders, type Order } from "./api/ordersApi";
+import OrdersSection from "./components/OrdersSection";
+import AdminSection from "./components/AdminSection";
+import AuthScreen from "./components/AuthScreen";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
 import "./styles/theme.css";
 
+type Section = "orders" | "admin";
 type View = "list" | "create" | "detail";
 
-export default function App() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [view, setView] = useState<View>("list");
-  const [selected, setSelected] = useState<Order | null>(null);
+function Shell() {
+  const { role } = useAuth();
+  const [section, setSection] = useState<Section>("orders");
 
-  const loadOrders = useCallback(() => {
-    setLoading(true);
-    setLoadError(null);
-    getOrders()
-      .then((data) => setOrders(data))
-      .catch((err: Error) => setLoadError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const [orderView, setOrderView] = useState<View>("list");
+  const [orderCount, setOrderCount] = useState(0);
 
-  useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
+  const [adminView, setAdminView] = useState<View>("list");
+  const [userCount, setUserCount] = useState(0);
 
-  const handleCreated = (created: Order) => {
-    // Кладём в список номер заказа от сервера.
-    setOrders((prev) => [created, ...prev]);
-    setView("list");
-  };
+  // Обычный пользователь не должен попасть в раздел "Пользователи" даже если
+  // section почему-то окажется "admin" — вкладка и так скрыта в TopBar, это доп. страховка.
+  const effectiveSection: Section = role === "Admin" ? section : "orders";
+  const isAdminSection = effectiveSection === "admin";
 
-  const openOrder = (order: Order) => {
-    setSelected(order);
-    setView("detail");
+  const currentView = isAdminSection ? adminView : orderView;
+  const newLabel = isAdminSection ? "+ Пользователь" : "+ Новый заказ";
+  const countLabel = isAdminSection
+    ? `Пользователей всего: ${userCount}`
+    : `Заказов всего: ${orderCount}`;
+
+  const handleNew = () => {
+    if (isAdminSection) setAdminView("create");
+    else setOrderView("create");
   };
 
   return (
     <div className="app-shell">
-      <TopBar view={view} onNew={() => setView("create")} count={orders.length} />
+      <TopBar
+        view={currentView}
+        onNew={handleNew}
+        newLabel={newLabel}
+        countLabel={countLabel}
+        section={effectiveSection}
+        onSectionChange={setSection}
+      />
       <div className="app-container">
-        {view === "list" && (
-          <OrderList orders={orders} loading={loading} error={loadError} onOpen={openOrder} onRetry={loadOrders} />
+        {isAdminSection ? (
+          <AdminSection view={adminView} onViewChange={setAdminView} onCountChange={setUserCount} />
+        ) : (
+          <OrdersSection view={orderView} onViewChange={setOrderView} onCountChange={setOrderCount} />
         )}
-        {view === "create" && <OrderForm onCreated={handleCreated} onCancel={() => setView("list")} />}
-        {view === "detail" && selected && <OrderDetail order={selected} onBack={() => setView("list")} />}
       </div>
     </div>
+  );
+}
+
+function Gate() {
+  const { token } = useAuth();
+  return token ? <Shell /> : <AuthScreen />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
   );
 }

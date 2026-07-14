@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Field from "./Field";
-import { createOrder, ValidationError, type Order, type CreateOrderPayload } from "../api/ordersApi";
+import { createOrder, type Order, type CreateOrderPayload } from "../api/ordersApi";
+import { ValidationError, AuthExpiredError } from "../api/http";
+import { useAuth } from "../auth/AuthContext";
 
 const emptyForm: Record<keyof CreateOrderPayload, string> = {
   senderCity: "",
@@ -17,6 +19,7 @@ interface OrderFormProps {
 }
 
 export default function OrderForm({ onCreated, onCancel }: OrderFormProps) {
+  const { token, logout } = useAuth();
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof CreateOrderPayload, string>>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +65,7 @@ export default function OrderForm({ onCreated, onCancel }: OrderFormProps) {
     return errs;
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const clientErrors = validateRequired();
     if (Object.keys(clientErrors).length) {
@@ -77,9 +80,13 @@ export default function OrderForm({ onCreated, onCancel }: OrderFormProps) {
         ...form,
         cargoWeight: Number(form.cargoWeight.replace(",", ".")),
       };
-      const created = await createOrder(payload);
+      const created = await createOrder(payload, token!);
       onCreated(created);
     } catch (err) {
+      if (err instanceof AuthExpiredError) {
+        logout();
+        return;
+      }
       if (err instanceof ValidationError) {
         setErrors(err.fieldErrors);
         setSubmitError(err.message);
