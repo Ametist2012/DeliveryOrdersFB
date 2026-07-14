@@ -167,10 +167,31 @@ http://localhost:5173
 
 Основные REST endpoints:
 
+## Authentication
+
+|**Метод**|**Endpoint**|**Назначение**|
+|---|---|---|
+| POST | `/api/auth/register` |Регистрация пользователя|
+| POST | `/api/auth/login` |Логин пользователя|
+
+---
+
+## Orders
+
 |**Метод**|**Endpoint**|**Назначение**|
 |---|---|---|
 |GET|`/api/orders`|Получение списка заказов|
 |POST|`/api/orders`|Создание нового заказа|
+
+---
+
+## Admin
+
+|**Метод**|**Endpoint**|**Назначение**|
+|---|---|---|
+| GET | `/api/admin/users` | Получить список всех пользователей |
+| POST | `/api/admin/users` | Добавить пользователя |
+| DELETE | `/api/admin/users/{id}` | Удалить пользователя |
 
 ---
 
@@ -301,3 +322,39 @@ npm run dev
 ```
 
 После выполнения этих шагов приложение готово к работе.
+
+---
+
+# 🛡 Exception Handling
+
+Добавлен глобальный middleware:
+
+```
+ExceptionHandlingMiddleware
+```
+
+Все необработанные ошибки возвращаются в едином формате:
+
+```json
+{
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "An unexpected error occurred."
+}
+```
+
+---
+
+# 📌 Добавлено:
+
+- JWT Аунтификация
+- Пользовательские роли для аунтификации (Admin, User)
+- Admin и User Менаджеры
+- Валидация данных для новых элементов API
+- Global Exception Handling  
+ 
+---
+
+
+
+
