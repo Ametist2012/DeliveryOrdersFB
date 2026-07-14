@@ -1,22 +1,35 @@
-# **Delivery Orders — Frontend**
+# Delivery Orders — Frontend
 
-Клиентская часть приложения для создания и просмотра заказов на доставку.
+Клиентская часть приложения **Delivery Orders** для управления заказами доставки.
 
-## **Технологии**
+Frontend предоставляет интерфейс для:
 
-- React 19
-- TypeScript
-- Vite
-- Fetch API
-- CSS3
+- регистрации пользователей;
+- авторизации через JWT;
+- создания заказов;
+- просмотра заказов;
+- работы с ролями пользователей;
+- взаимодействия с ASP.NET Core Web API.
 
 ---
 
-## **Требования**
+# 🛠 Технологии
+
+## Frontend
+
+- **React**
+- **TypeScript**
+- **Vite**
+- **Fetch API**
+- **CSS**
+
+---
+
+# 📋 Требования
 
 Перед запуском убедитесь, что установлены:
 
-- Node.js 24+ 
+- Node.js 24+
 - npm 24+
 
 Проверить версии:
@@ -28,7 +41,7 @@ npm -v
 
 ---
 
-## **Установка зависимостей**
+# 📦 Install
 
 Перейдите в папку frontend:
 
@@ -44,15 +57,15 @@ npm install
 
 ---
 
-## **Запуск приложения**
+# ▶️ Запуск
 
-Запустите development-сервер:
+Запуск development-сервера:
 
 ```bash
 npm run dev
 ```
 
-После запуска приложение будет доступно по адресу:
+После запуска приложение будет доступно:
 
 ```text
 http://localhost:5173
@@ -60,82 +73,157 @@ http://localhost:5173
 
 ---
 
-## **Backend**
+# 🔗 Backend
 
-Перед запуском frontend необходимо запустить Backend API.
+Frontend работает совместно с ASP.NET Core Web API.
 
-Backend/README.md
-
----
-
-## **Доступные команды**
-
-Установить зависимости:
+Перед запуском frontend необходимо запустить backend:
 
 ```bash
-npm install
+cd backend
+
+docker compose up -d
+
+dotnet ef database update
+
+dotnet run
 ```
 
-Запустить приложение:
+Backend API:
 
-```bash
-npm run dev
+```text
+http://localhost:5056
 ```
 
-Собрать production-версию:
+Swagger:
 
-```bash
-npm run build
-```
-
-Просмотреть production-сборку локально:
-
-```bash
-npm run preview
-```
-
-Проверить код линтером:
-
-```bash
-npm run lint
+```text
+http://localhost:5056/swagger
 ```
 
 ---
 
-## **Основной функционал**
+# 🔐 Authentication
+
+В приложении используется JWT Authentication.
+
+После успешного входа:
+
+```
+POST /api/auth/login
+```
+
+Frontend получает JWT token:
+
+```json
+{
+  "token": "jwt_token"
+}
+```
+
+Токен используется для доступа к защищенным endpoint.
+
+Передача токена:
+
+```http
+Authorization: Bearer YOUR_TOKEN
+```
+
+---
+
+# 👥 User Roles
+
+Frontend отображает функциональность в зависимости от роли пользователя.
+
+---
+
+# ✨ Основные характеристики
+
+## Аунтификация
+
+- регистрация пользователя;
+- авторизация;
+- сохранение JWT token;
+- обработка ошибок входа.
+
+---
+
+## Заказы
 
 - создание нового заказа;
 - просмотр списка заказов;
-- просмотр детальной информации о заказе;
-- клиентская и серверная валидация формы;
-- отображение сообщений об ошибках;
-- адаптивный интерфейс.
+- просмотр информации о заказе;
+- отображение ошибок валидации.
 
 ---
 
-## **Используемый Backend**
+## Валидация
 
-Frontend взаимодействует с ASP.NET Core Web API.
+Frontend поддерживает:
 
-Основные REST-эндпоинты:
+- проверку обязательных полей;
+- проверку форматов данных;
+- отображение серверных ошибок;
+- обработку стандартных API ответов:
 
-|**Метод**|**Endpoint**|**Назначение**|
+```json
+{
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "CargoWeight": [
+      "The Cargo's weight must be between 0.01 and 100000 kg"
+    ]
+  }
+}
+```
+
+---
+
+# 🌐 Backend API
+
+Frontend взаимодействует с REST API.
+
+## Authentication
+
+| Method | Endpoint | Description |
 |---|---|---|
-|GET|`/api/orders`|Получение списка заказов|
-|POST|`/api/orders`|Создание нового заказа|
+| POST | `/api/auth/register` | Регистрация пользователя |
+| POST | `/api/auth/login` | Авторизация |
 
 ---
 
-## **Разработка**
+## Orders
 
-После изменения исходного кода приложение автоматически перезагружается благодаря Vite Hot Module Replacement (HMR).
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/orders` | User, Admin |
+| POST | `/api/orders` | User, Admin |
 
-В production рекомендуется использовать команду:
+---
+
+## Admin
+
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/admin/users` | Admin |
+| POST | `/api/admin/users` | Admin |
+| DELETE | `/api/admin/users/{id}` | Admin |
+
+---
+
+# Info
+
+После изменения исходного кода приложение автоматически обновляется благодаря:
+
+```
+Vite Hot Module Replacement (HMR)
+```
+
+Для production рекомендуется использовать:
 
 ```bash
 npm run build
 ```
 
-
 ---
-
