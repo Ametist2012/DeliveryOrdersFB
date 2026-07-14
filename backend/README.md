@@ -1,12 +1,12 @@
-# **🐘 База данных PostgreSQL**
+# 🐘 Database
 
-В проекте используется:
+Проект использует:
 
 - **PostgreSQL**
-- **Docker Compose** для запуска базы данных в контейнере
-- **Entity Framework Core** для работы с базой данных и миграциями
+- **Docker Compose** для запуска базы данных
+- **Entity Framework Core** для миграций и работы с БД
 
-Конфигурация PostgreSQL находится в файле:
+Конфигурация базы данных находится в:
 
 ```text
 backend/docker-compose.yml
@@ -16,7 +16,7 @@ backend/docker-compose.yml
 
 ---
 
-# **🐳 Запуск PostgreSQL**
+# 🐳 Running PostgreSQL
 
 Перейдите в папку backend:
 
@@ -30,25 +30,27 @@ cd DeliveryOrders/backend
 docker compose up -d
 ```
 
-Проверьте, что контейнер успешно запущен:
+Проверьте, что контейнер запущен:
 
 ```bash
 docker ps
 ```
 
-Остановить контейнеры:
+Остановить контейнер:
 
 ```bash
 docker compose down
 ```
 
-**Примечание:** если используется Docker Volume, данные базы сохранятся даже после выполнения `docker compose down`.
+> **Примечание**
+>
+> Если используется Docker Volume, данные базы данных сохраняются даже после выполнения `docker compose down`.
 
 ---
 
-# **⚙️ Настройка подключения**
+# ⚙️ Database Configuration
 
-Строка подключения находится в файле:
+Строка подключения находится в:
 
 ```text
 backend/appsettings.json
@@ -64,45 +66,35 @@ backend/appsettings.json
 }
 ```
 
-Параметры строки подключения должны соответствовать настройкам, указанным в:
+Параметры должны соответствовать настройкам в:
 
 ```text
 backend/docker-compose.yml
 ```
 
-Например:
-
-- Host
-- Port
-- Database
-- Username
-- Password
-
 ---
 
-# **🗄️ Применение миграций**
+# 🗄️ Database Migrations
 
-После первого запуска PostgreSQL необходимо создать структуру базы данных.
-
-Выполните команду:
+После первого запуска PostgreSQL необходимо применить миграции:
 
 ```bash
 dotnet ef database update
 ```
 
-Entity Framework Core автоматически:
+Entity Framework автоматически:
 
 - создаст базу данных (если она отсутствует);
 - применит все существующие миграции;
 - создаст необходимые таблицы.
 
-При изменении моделей данных создайте новую миграцию:
+Создание новой миграции:
 
 ```bash
 dotnet ef migrations add MigrationName
 ```
 
-После этого снова примените изменения:
+Применение миграций:
 
 ```bash
 dotnet ef database update
@@ -110,19 +102,17 @@ dotnet ef database update
 
 ---
 
-# **💻 Подключение к PostgreSQL через терминал**
+# 💻 PostgreSQL CLI
 
-Подключиться к базе данных внутри контейнера можно командой:
+Подключиться к базе данных внутри контейнера:
 
 ```bash
 docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 ```
 
-После подключения становятся доступны стандартные команды PostgreSQL.
+Полезные команды PostgreSQL:
 
-Например:
-
-Показать список таблиц:
+Список таблиц:
 
 ```sql
 \dt
@@ -131,10 +121,10 @@ docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 Описание таблицы:
 
 ```sql
-\d Orders
+\d "Orders"
 ```
 
-Выход из консоли PostgreSQL:
+Выход:
 
 ```sql
 \q
@@ -142,9 +132,9 @@ docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 
 ---
 
-# **🚀 Первый запуск проекта**
+# 🚀 Running the Project
 
-После клонирования репозитория выполните следующие команды:
+После клонирования репозитория выполните:
 
 ```bash
 cd DeliveryOrders/backend
@@ -158,36 +148,170 @@ dotnet ef database update
 dotnet run
 ```
 
-После этого:
+После запуска:
 
-- PostgreSQL будет запущен;
-- структура базы данных будет создана;
-- API станет доступно для работы.  
+- PostgreSQL будет доступен;
+- все миграции будут применены;
+- API будет готово к работе.
 
 ---
 
-# **🌐 Swagger UI**
+# 🔐 Authentication
 
-После запуска приложения Swagger UI будет доступен по адресу:
+Проект использует **JWT Bearer Authentication**.
 
-```text
-http://localhost:5056/swagger/index.html
+Для получения токена:
+
+```
+POST /api/auth/login
 ```
 
-Или просто:
+Ответ:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+Для обращения к защищённым endpoint необходимо передавать заголовок:
+
+```text
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+---
+
+# 👥 Roles
+
+Поддерживаются две роли пользователей:
+
+- `User`
+- `Admin`
+
+Ограничение доступа реализовано через атрибуты:
+
+```csharp
+[Authorize(Roles = "Admin")]
+```
+
+или
+
+```csharp
+[Authorize(Roles = "User,Admin")]
+```
+
+---
+
+# 📦 API
+
+## Authentication
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/auth/register` | Регистрация пользователя |
+| POST | `/api/auth/login` | Авторизация |
+
+---
+
+## Orders
+
+| Method | Endpoint | Access |
+|---------|----------|--------|
+| GET | `/api/orders` | User, Admin |
+| POST | `/api/orders` | User, Admin |
+
+Доступ требует авторизации.
+---
+
+## Admin
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/admin/users` | Получить список пользователей |
+| POST | `/api/admin/users` | Создать пользователя |
+| DELETE | `/api/admin/users/{id}` | Удалить пользователя |
+
+Доступ только для роли **Admin**.
+
+---
+
+# ✅ Validation
+
+Для всех DTO используется собственная система валидации.
+
+Проверяются:
+
+- обязательные поля;
+- длина строк;
+- Email;
+- пароль;
+- роли пользователей;
+- данные заказа.
+
+При ошибках API возвращает стандартный `ValidationProblemDetails`:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "CargoWeight": [
+      "The Cargo's weight must be between 0.01 and 100000 kg"
+    ]
+  }
+}
+```
+
+---
+
+# 🛡 Exception Handling
+
+Добавлен глобальный middleware:
+
+```
+ExceptionHandlingMiddleware
+```
+
+Все необработанные исключения возвращаются в едином формате:
+
+```json
+{
+  "title": "Internal server error",
+  "status": 500,
+  "detail": "An unexpected error occurred."
+}
+```
+
+---
+
+# 🌐 Swagger UI
+
+После запуска приложения документация доступна по адресу:
 
 ```text
 http://localhost:5056/swagger
 ```
 
+или
+
+```text
+http://localhost:5056/swagger/index.html
+```
+
 В Swagger можно:
 
-- просмотреть все доступные API-эндпоинты;
-- протестировать запросы прямо из браузера;
-- посмотреть модели запросов и ответов;
-- проверить коды ответов сервера.
+- просматривать все endpoints;
+- выполнять запросы;
+- получать JWT;
+- авторизоваться через кнопку **Authorize**;
+- тестировать защищённые методы.
 
-**Примечание:** если в `launchSettings.json` изменится порт, адрес Swagger также изменится.
+Для авторизации необходимо ввести:
+
+```text
+Bearer YOUR_JWT_TOKEN
+```
 
 ---
-
