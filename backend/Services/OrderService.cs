@@ -48,8 +48,9 @@ public class OrderService : IOrderService
         await _repOrder.SaveChangesAsync();
 
         return new OrderResponse
-        {
+        {     
             OrderNumber = order.OrderNumber,
+            EmailUser = _servCrUs.Email,
             SenderCity = order.SenderCity,
             SenderAddress = order.SenderAddress,
             ReceiverCity = order.ReceiverCity,
@@ -68,6 +69,7 @@ public class OrderService : IOrderService
         var orders = result.Items.Select(order => new OrderResponse
         {
             CreatedAt = order.CreatedAt, 
+            EmailUser = order.User.Email,
             OrderNumber = order.OrderNumber, 
             SenderCity = order.SenderCity,
             SenderAddress = order.SenderAddress,

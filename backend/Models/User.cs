@@ -7,4 +7,5 @@ public class User
     public string Email { get; set; } = string.Empty; //e-mail, он же Login
     public string PasswordHash { get; set; } = string.Empty; //Хеш-пароля, т.к. пароли не хранят в БД
     public string Role { get; set; } = ""; //Роли - user, admin
+    public ICollection<Order> Orders { get; set; } = []; //Связь с Order 
 }

@@ -55,7 +55,7 @@ public class OrderRepository : IOrderRepository
 
     public async Task<(List<Order> Items, int TotalCount)> GetPagedAsync(OrderQueryRequest request)
     {
-        IQueryable<Order> query = _db.Orders;
+        IQueryable<Order> query = _db.Orders.Include(x => x.User);
         var totalCount = await query.CountAsync();
         query = ApplySorting(query, request);
 

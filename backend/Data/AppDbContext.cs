@@ -29,5 +29,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             
             modelBuilder.Entity<OrderCounter>()
                 .HasKey(x => x.Date);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Orders)
+                .HasForeignKey(x => x.UserId);
         }
 }
