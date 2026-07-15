@@ -61,10 +61,11 @@ public class OrderService : IOrderService
     }
 
 
-    public async Task<List<OrderResponse>> GetAllSortSAsync(OrderQueryRequest request)
+    public async Task<PagedResponse<OrderResponse>> GetPagedSAsync(OrderQueryRequest request)
     {
-        var orders = await _repOrder.GetAllSortAsync(request);
-        return orders.Select(order => new OrderResponse
+        var result = await _repOrder.GetPagedAsync(request);
+
+        var orders = result.Items.Select(order => new OrderResponse
         {
             CreatedAt = order.CreatedAt, 
             OrderNumber = order.OrderNumber, 
@@ -75,6 +76,15 @@ public class OrderService : IOrderService
             CargoWeight = order.CargoWeight,
             CargoPickupDate = order.CargoPickupDate
         }).ToList();
+
+        return new PagedResponse<OrderResponse>
+        {
+            Items = orders,
+            Page = request.Page,
+            PageSize = request.PageSize,
+            TotalItems = result.TotalCount,
+            TotalPages = (int)Math.Ceiling(result.TotalCount / (double)request.PageSize)
+        };
     }
 
     private async Task<string> GenerateOrderNumberAsync()

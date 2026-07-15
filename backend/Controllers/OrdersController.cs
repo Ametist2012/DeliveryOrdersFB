@@ -55,7 +55,7 @@ public class OrdersController : ControllerBase
             return ValidationProblem(ModelState); 
         }
 
-        var orders = await _service.GetAllSortSAsync(request);
+        var orders = await _service.GetPagedSAsync(request);
         return Ok(orders);
     }
 }

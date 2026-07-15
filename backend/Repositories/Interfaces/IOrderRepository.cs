@@ -7,6 +7,6 @@ public interface IOrderRepository
 {
     Task AddAsync(Order order);             
     Task<Order?> GetByOrderNumberAsync(string orderNumber); 
-    Task<List<Order>> GetAllSortAsync(OrderQueryRequest request);
+    Task<(List<Order> Items, int TotalCount)> GetPagedAsync(OrderQueryRequest request);
     Task SaveChangesAsync();
 }

@@ -53,12 +53,15 @@ public class OrderRepository : IOrderRepository
                     .FirstOrDefaultAsync();
     }
 
-    public async Task<List<Order>> GetAllSortAsync(OrderQueryRequest request)
+    public async Task<(List<Order> Items, int TotalCount)> GetPagedAsync(OrderQueryRequest request)
     {
         IQueryable<Order> query = _db.Orders;
+        var totalCount = await query.CountAsync();
         query = ApplySorting(query, request);
 
-        return await query.ToListAsync();
+        var items = await query.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+
+        return (items, totalCount);
     }
 
 
