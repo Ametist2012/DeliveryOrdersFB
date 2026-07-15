@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>Delivery Orders API</AssemblyName>
-    <Version>2.0.1</Version>
+    <Version>3.0.1</Version>
     <Description>API for delivery order management</Description>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
