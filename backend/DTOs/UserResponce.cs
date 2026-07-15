@@ -1,4 +1,4 @@
-namespace DeliveryOrders.Models;
+namespace DeliveryOrders.DTOs;
 
 public class UserResponce
 {
