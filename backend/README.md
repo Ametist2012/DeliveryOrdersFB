@@ -1,22 +1,35 @@
-# 🐘 Database
+# Delivery Orders API
 
-Проект использует:
+Backend-приложение для управления заказами доставки.
 
-- **PostgreSQL**
-- **Docker Compose** для запуска базы данных
-- **Entity Framework Core** для миграций и работы с БД
+Проект реализован на:
 
-Конфигурация базы данных находится в:
-
-```text
-backend/docker-compose.yml
-```
-
-После запуска Docker автоматически создается контейнер PostgreSQL.
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL
+- Docker Compose
+- JWT Authentication
+- Role Based Authorization
 
 ---
 
-# 🐳 Running PostgreSQL
+# 🐘 База данных
+
+Проект использует:
+
+- PostgreSQL
+- Docker Compose для запуска базы данных
+- Entity Framework Core для работы с миграциями
+
+Конфигурация базы данных:
+
+```
+backend/docker-compose.yml
+```
+
+---
+
+# 🐳 Запуск PostgreSQL
 
 Перейдите в папку backend:
 
@@ -24,35 +37,33 @@ backend/docker-compose.yml
 cd DeliveryOrders/backend
 ```
 
-Запустите контейнер:
+Запуск контейнера:
 
 ```bash
 docker compose up -d
 ```
 
-Проверьте, что контейнер запущен:
+Проверка запущенных контейнеров:
 
 ```bash
 docker ps
 ```
 
-Остановить контейнер:
+Остановка:
 
 ```bash
 docker compose down
 ```
 
-> **Примечание**
->
-> Если используется Docker Volume, данные базы данных сохраняются даже после выполнения `docker compose down`.
+> При использовании Docker Volume данные PostgreSQL сохраняются после остановки контейнера.
 
 ---
 
-# ⚙️ Database Configuration
+# ⚙️ Настройка базы данных
 
-Строка подключения находится в:
+Строка подключения находится:
 
-```text
+```
 backend/appsettings.json
 ```
 
@@ -66,27 +77,27 @@ backend/appsettings.json
 }
 ```
 
-Параметры должны соответствовать настройкам в:
+Параметры должны совпадать с:
 
-```text
-backend/docker-compose.yml
+```
+docker-compose.yml
 ```
 
 ---
 
-# 🗄️ Database Migrations
+# 🗄 Миграции Entity Framework Core
 
-После первого запуска PostgreSQL необходимо применить миграции:
+После первого запуска базы необходимо применить миграции:
 
 ```bash
 dotnet ef database update
 ```
 
-Entity Framework автоматически:
+EF Core автоматически:
 
-- создаст базу данных (если она отсутствует);
-- применит все существующие миграции;
-- создаст необходимые таблицы.
+- создаст необходимые таблицы;
+- применит миграции;
+- настроит связи между таблицами.
 
 Создание новой миграции:
 
@@ -102,15 +113,15 @@ dotnet ef database update
 
 ---
 
-# 💻 PostgreSQL CLI
+# 💻 Работа с PostgreSQL CLI
 
-Подключиться к базе данных внутри контейнера:
+Подключение к базе:
 
 ```bash
 docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 ```
 
-Полезные команды PostgreSQL:
+Полезные команды:
 
 Список таблиц:
 
@@ -132,9 +143,9 @@ docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 
 ---
 
-# 🚀 Running the Project
+# 🚀 Запуск проекта
 
-После клонирования репозитория выполните:
+После клонирования проекта:
 
 ```bash
 cd DeliveryOrders/backend
@@ -150,52 +161,70 @@ dotnet run
 
 После запуска:
 
-- PostgreSQL будет доступен;
-- все миграции будут применены;
-- API будет готово к работе.
+API доступен:
+
+```
+http://localhost:5056
+```
+
+Swagger:
+
+```
+http://localhost:5056/swagger
+```
 
 ---
 
-# 🔐 Authentication
+# 🔐 Аутентификация
 
-Проект использует **JWT Bearer Authentication**.
+Используется JWT Bearer Authentication.
 
-Для получения токена:
+Получение токена:
 
 ```
 POST /api/auth/login
 ```
 
-Ответ:
+Пример ответа:
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+  "token": "eyJhbGciOiJIUzI1Ni..."
 }
 ```
 
-Для обращения к защищённым endpoint необходимо передавать заголовок:
+Для защищённых запросов необходимо передавать:
 
-```text
-Authorization: Bearer YOUR_JWT_TOKEN
+```
+Authorization: Bearer TOKEN
+```
+
+В Swagger:
+
+1. Нажать кнопку **Authorize**
+2. Ввести:
+
+```
+Bearer YOUR_TOKEN
 ```
 
 ---
 
-# 👥 Roles
+# 👥 Роли пользователей
 
-Поддерживаются две роли пользователей:
+Поддерживаются роли:
 
-- `User`
-- `Admin`
+- User
+- Admin
 
-Ограничение доступа реализовано через атрибуты:
+
+Ограничение доступа:
 
 ```csharp
 [Authorize(Roles = "Admin")]
 ```
 
-или
+или:
 
 ```csharp
 [Authorize(Roles = "User,Admin")]
@@ -207,38 +236,296 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ## Authentication
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/api/auth/register` | Регистрация пользователя |
-| POST | `/api/auth/login` | Авторизация |
+| Метод | Endpoint             | Описание                 |
+| ----- | -------------------- | ------------------------ |
+| POST  | `/api/auth/register` | Регистрация пользователя |
+| POST  | `/api/auth/login`    | Авторизация              |
 
 ---
 
-## Orders
+# 🔐 Регистрация и авторизация пользователей
 
-| Method | Endpoint | Access |
-|---------|----------|--------|
-| GET | `/api/orders` | User, Admin |
-| POST | `/api/orders` | User, Admin |
+## 📝 Регистрация пользователя
 
-Доступ требует авторизации.
+Endpoint: `POST /api/auth/register`
+Используется для создания нового пользователя в системе.
+
+При регистрации необходимо передать:
+- имя пользователя;
+- email;
+- пароль;
+
+Пример запроса:
+
+```json
+{
+  "name": "Александр Иванов",
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
 ---
 
-## Admin
+## **🔑 Авторизация пользователя**
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/api/admin/users` | Получить список пользователей |
-| POST | `/api/admin/users` | Создать пользователя |
-| DELETE | `/api/admin/users/{id}` | Удалить пользователя |
+Endpoint: `POST /api/auth/login`
 
-Доступ только для роли **Admin**.
+Используется для входа пользователя в систему.
+
+В запрос передаются:
+- email;
+- пароль.
+
+Пример:
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+При успешной проверке данных API возвращает JWT токен:
+
+```JSON
+{
+  "token": "eyJhbGciOiJIUzI1Ni..."
+}
+```
+
+---
+# 📦 Orders
+
+| Метод | Endpoint | Доступ | Описание |
+|-|-|-|-|
+| GET | `/api/orders` | User, Admin | Получение списка заказов |
+| GET | `/api/orders/{orderNumber}` | User, Admin | Получение заказа по номеру |
+| POST | `/api/orders` | User, Admin | Создание заказа |
+| DELETE | `/api/orders/{orderNumber}` | User, Admin | Удаление заказа |
 
 ---
 
-# ✅ Validation
+# 📋 Получение заказов
 
-Для всех DTO используется собственная система валидации.
+Endpoint:
+
+```
+GET /api/orders
+```
+
+Поддерживается:
+
+- пагинация;
+- сортировка;
+- получение email владельца заказа.
+
+Пример:
+
+```
+GET /api/orders?page=1&pageSize=10&sortBy=CreatedAt&direction=Desc
+```
+
+---
+
+## Параметры запроса
+
+| Параметр | Описание |
+|-|-|
+| page | Номер страницы |
+| pageSize | Количество элементов |
+| sortBy | Поле сортировки |
+| direction | Направление сортировки |
+
+---
+
+# 🔄 Сортировка заказов
+
+Доступные поля:
+
+```
+CreatedAt
+OrderNumber
+SenderCity
+SenderAddress
+ReceiverCity
+ReceiverAddress
+CargoWeight
+CargoPickupDate
+```
+
+Направления:
+
+```
+Asc
+Desc
+```
+
+Пример:
+
+```
+GET /api/orders?sortBy=CargoWeight&direction=Asc
+```
+
+---
+
+# 📄 Пагинация
+
+Ответ содержит:
+
+```json
+{
+  "items": [],
+  "page": 1,
+  "pageSize": 10,
+  "totalItems": 100,
+  "totalPages": 10,
+  "hasNextPage": true
+}
+```
+
+Описание:
+
+| Поле | Значение |
+|-|-|
+| items | Список заказов |
+| page | Текущая страница |
+| pageSize | Размер страницы |
+| totalItems | Количество записей |
+| totalPages | Количество страниц |
+| hasNextPage | Есть ли следующая страница |
+
+---
+
+# 🔎 Получение заказа по номеру
+
+Endpoint:
+
+```
+GET /api/orders/{orderNumber}
+```
+
+Пример:
+
+```
+GET /api/orders/DLV-20260715-000001
+```
+
+---
+
+# 🗑 Удаление заказа
+
+Endpoint:
+
+```
+DELETE /api/orders/{orderNumber}
+```
+
+Пример:
+
+```
+DELETE /api/orders/DLV-20260715-000001
+```
+
+Правила:
+
+- User не может ничего удалить.
+- Admin может удалить любой заказ.
+
+Успешный ответ:
+
+```json
+{
+  "message": "Order deleted successfully",
+  "orderNumber": "DLV-20260715-000001"
+}
+```
+
+Если заказ отсутствует:
+
+```json
+{
+  "title": "Order not found",
+  "status": 404,
+  "detail": "Order does not exist."
+}
+```
+
+---
+
+# 👤 Связь Users и Orders
+
+Связь:
+
+```
+User 1 ---- * Order
+```
+
+В таблице Orders хранится:
+
+```csharp
+UserId
+```
+
+Связь реализована через Entity Framework:
+
+```csharp
+modelBuilder.Entity<Order>()
+    .HasOne(x => x.User)
+    .WithMany(x => x.Orders)
+    .HasForeignKey(x => x.UserId);
+```
+
+Получение пользователя вместе с заказом:
+
+```csharp
+.Include(x => x.User)
+```
+
+После этого можно получить:
+
+```csharp
+order.User.Email
+```
+
+---
+
+# 🔢 Генерация номера заказа
+
+Номер заказа создаётся автоматически.
+
+Формат:
+
+```
+DLV-{Дата}-{Номер}
+```
+
+Пример:
+
+```
+DLV-20260715-000001
+```
+
+Логика:
+
+- уникальный номер;
+- ежедневная нумерация;
+- хранение счётчика в таблице OrderCounters.
+
+Пример:
+
+```
+2026-07-15
+
+000001
+000002
+000003
+```
+
+---
+
+# ✅ Валидация
+
+Все DTO проходят собственную валидацию.
 
 Проверяются:
 
@@ -246,27 +533,26 @@ Authorization: Bearer YOUR_JWT_TOKEN
 - длина строк;
 - Email;
 - пароль;
-- роли пользователей;
-- данные заказа.
+- роль пользователя;
+- вес груза;
+- дата забора груза.
 
-При ошибках API возвращает стандартный `ValidationProblemDetails`:
+Пример ошибки:
 
 ```json
 {
-  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
-  "title": "One or more validation errors occurred.",
-  "status": 400,
   "errors": {
     "CargoWeight": [
       "The Cargo's weight must be between 0.01 and 100000 kg"
     ]
-  }
+  },
+  "status":400
 }
 ```
 
 ---
 
-# 🛡 Exception Handling
+# 🛡 Обработка исключений
 
 Добавлен глобальный middleware:
 
@@ -274,44 +560,30 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ExceptionHandlingMiddleware
 ```
 
-Все необработанные исключения возвращаются в едином формате:
+Все необработанные ошибки возвращаются в едином формате:
 
 ```json
 {
   "title": "Internal server error",
-  "status": 500,
-  "detail": "An unexpected error occurred."
+  "status":500,
+  "detail":"An unexpected error occurred."
 }
 ```
 
 ---
 
-# 🌐 Swagger UI
+# Swagger
 
-После запуска приложения документация доступна по адресу:
+Документация API:
 
-```text
+```
 http://localhost:5056/swagger
 ```
 
-или
+Swagger позволяет:
 
-```text
-http://localhost:5056/swagger/index.html
-```
-
-В Swagger можно:
-
-- просматривать все endpoints;
+- просматривать endpoints;
 - выполнять запросы;
 - получать JWT;
-- авторизоваться через кнопку **Authorize**;
-- тестировать защищённые методы.
-
-Для авторизации необходимо ввести:
-
-```text
-Bearer YOUR_JWT_TOKEN
-```
-
----
+- тестировать роли;
+- проверять ответы API.
