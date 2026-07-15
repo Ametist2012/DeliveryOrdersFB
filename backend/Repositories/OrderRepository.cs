@@ -2,11 +2,28 @@ using DeliveryOrders.Data;
 using DeliveryOrders.Models;
 using DeliveryOrders.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using DeliveryOrders.DTOs;
+using DeliveryOrders.Enums;
+using System.Linq.Expressions;
 
 namespace DeliveryOrders.Repositories;
 
 public class OrderRepository : IOrderRepository
 {
+    private static readonly Dictionary<
+                            OrderSortField,
+                            Expression<Func<Order, object>> 
+                            > SortDictSortBy = new()
+                            {
+                                {OrderSortField.CreatedAt, x => x.CreatedAt},
+                                {OrderSortField.OrderNumber, x=> x.OrderNumber},
+                                {OrderSortField.SenderCity, x => x.SenderCity},
+                                {OrderSortField.SenderAddress, x => x.SenderAddress},
+                                {OrderSortField.ReceiverCity, x => x.ReceiverCity},
+                                {OrderSortField.ReceiverAddress, x => x.ReceiverAddress},
+                                {OrderSortField.CargoWeight, x => x.CargoWeight},
+                                {OrderSortField.CargoPickupDate, x => x.CargoPickupDate}
+                            };
     private readonly AppDbContext _db;
 
     public OrderRepository(AppDbContext db)
@@ -36,16 +53,27 @@ public class OrderRepository : IOrderRepository
                     .FirstOrDefaultAsync();
     }
 
-    public async Task<List<Order>> GetAllAsync()
+    public async Task<List<Order>> GetAllAsync(OrderQueryRequest request)
     {
-        return await _db.Orders
-            .AsNoTracking()
-            .ToListAsync();
+        IQueryable<Order> query = _db.Orders;
+        query = ApplySorting(query, request);
+
+        return await query.ToListAsync();
     }
 
 
     public async Task SaveChangesAsync()
     {
         await _db.SaveChangesAsync();
+    }
+
+    private static IQueryable<Order> ApplySorting(IQueryable<Order> query, OrderQueryRequest request)
+    {
+        if (!SortDictSortBy.TryGetValue(request.SortBy, out var expression))
+            { expression = x =>x.CreatedAt; }
+        
+        return request.Direction == SortDirection.Asc
+                ? query.OrderBy(expression)
+                : query.OrderByDescending(expression);
     }
 }
