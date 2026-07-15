@@ -7,6 +7,8 @@ public interface IOrderRepository
 {
     Task AddAsync(Order order);             
     Task<Order?> GetByOrderNumberAsync(string orderNumber); 
+    Task<Order?> GetByIdAsync(Guid id);
     Task<(List<Order> Items, int TotalCount)> GetPagedAsync(OrderQueryRequest request);
+    void Delete(Order order);
     Task SaveChangesAsync();
 }

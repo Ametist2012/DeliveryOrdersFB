@@ -58,4 +58,20 @@ public class OrdersController : ControllerBase
         var orders = await _service.GetPagedSAsync(request);
         return Ok(orders);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{orderNumber}")]
+    public async Task<IActionResult> DeleteOrder(string orderNumber)
+    {
+    var result = await _service.DeleteAsync(orderNumber);
+
+    if (!result)
+        {
+            return Problem( title: "Order not found",
+                            detail: $"Order with number {orderNumber} does not exist.",
+                            statusCode: StatusCodes.Status404NotFound);
+        }
+        return Ok(new { message = "Order deleted successfully", 
+                        orderNumber});
+    }
 }

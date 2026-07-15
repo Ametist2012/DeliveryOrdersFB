@@ -96,4 +96,14 @@ public class OrderService : IOrderService
         
         return $"DLV-{today:yyyyMMdd}-{nextNumber:D6}";
     }
+
+    public async Task<bool> DeleteAsync(string orderNumber)
+    {
+        var order = await _repOrder.GetByOrderNumberAsync(orderNumber);
+        if(order == null) { return false; }
+
+        _repOrder.Delete(order);
+        await _repOrder.SaveChangesAsync();
+            return true;
+    }
 }

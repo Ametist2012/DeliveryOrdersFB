@@ -53,6 +53,13 @@ public class OrderRepository : IOrderRepository
                     .FirstOrDefaultAsync();
     }
 
+    public async Task<Order?> GetByIdAsync(Guid id)
+    {
+        return await _db.Orders
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<(List<Order> Items, int TotalCount)> GetPagedAsync(OrderQueryRequest request)
     {
         IQueryable<Order> query = _db.Orders.Include(x => x.User);
@@ -78,5 +85,10 @@ public class OrderRepository : IOrderRepository
         return request.Direction == SortDirection.Asc
                 ? query.OrderBy(expression)
                 : query.OrderByDescending(expression);
+    }
+
+    public void Delete(Order order)
+    {
+        _db.Orders.Remove(order);
     }
 }
