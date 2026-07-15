@@ -41,6 +41,7 @@ public class OrderRepository : IOrderRepository
     public async Task<Order?> GetByOrderNumberAsync(string orderNumber)
     {
         return await _db.Orders
+            .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber);
     }
 

@@ -106,4 +106,21 @@ public class OrderService : IOrderService
         await _repOrder.SaveChangesAsync();
             return true;
     }
+
+    public async Task<OrderResponse?> GetByOrderNumberAsync(string orderNumber)
+    {
+        var order = await _repOrder.GetByOrderNumberAsync(orderNumber);
+        if (order == null) { return null; }
+
+        return new OrderResponse
+        {   OrderNumber = order.OrderNumber,
+            EmailUser = order.User.Email,
+            CreatedAt = order.CreatedAt,
+            SenderCity = order.SenderCity,
+            SenderAddress = order.SenderAddress,
+            ReceiverCity = order.ReceiverCity,
+            ReceiverAddress = order.ReceiverAddress,
+            CargoWeight = order.CargoWeight,
+            CargoPickupDate = order.CargoPickupDate};
+    }
 }
