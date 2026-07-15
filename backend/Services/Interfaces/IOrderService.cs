@@ -7,5 +7,7 @@ namespace DeliveryOrders.Services.Interfaces;
 public interface IOrderService
 {
     Task<OrderResponse> CreateAsync(CreateOrderRequest request);
-    Task<List<OrderResponse>> GetAllAsync();
+    Task<PagedResponse<OrderResponse>> GetPagedSAsync(OrderQueryRequest request);
+    Task<bool> DeleteAsync(string orderNumber);
+    Task<OrderResponse?> GetByOrderNumberAsync(string orderNumber);
 }

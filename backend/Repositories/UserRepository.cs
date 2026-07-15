@@ -42,15 +42,14 @@ public class UserRepository : IUserRepository
     // получить всех пользователей
     public async Task<List<User>> GetAllAsync()
     {
-        return _db.Users.ToList();
+        return await _db.Users.ToListAsync();
     }
 
     // только админы
     public async Task<List<User>> GetAdminsAsync()
     {
-        return _db.Users
-            .Where(u => u.Role == Role.Admin.ToString())
-            .ToList();
+        return await _db.Users.Where(i => i.Role == Role.Admin.ToString()).ToListAsync();
+                    
     }
 
     // добавить пользователя

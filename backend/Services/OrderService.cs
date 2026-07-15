@@ -3,16 +3,23 @@ using DeliveryOrders.Repositories;
 using DeliveryOrders.DTOs;
 using DeliveryOrders.Repositories.Interfaces;
 using DeliveryOrders.Services.Interfaces;
+using System.Security.Claims;
 
 namespace DeliveryOrders.Services;
 
 public class OrderService : IOrderService
 {
-    private readonly IOrderRepository _repository;
+    private readonly IOrderRepository _repOrder;
+    private readonly IOrderCounterRepository _repCount;
+    private readonly ICurrentUserService _servCrUs;
 
-    public OrderService(IOrderRepository repository)
+    public OrderService(IOrderRepository repOrder,
+                        IOrderCounterRepository repCount,
+                        ICurrentUserService servCrUs)
     {
-        _repository = repository;
+        _repOrder = repOrder;
+        _repCount = repCount;
+        _servCrUs = servCrUs;
     }
 
     private string Normalize(string value)
@@ -26,6 +33,7 @@ public class OrderService : IOrderService
         var order = new Order
         {
             Id = Guid.NewGuid(),
+            UserId = _servCrUs.UserId,
             CreatedAt = DateTime.UtcNow,
             OrderNumber = await GenerateOrderNumberAsync(),
             SenderCity = Normalize(request.SenderCity),
@@ -36,12 +44,13 @@ public class OrderService : IOrderService
             CargoPickupDate = request.CargoPickupDate
         };
        
-        await _repository.AddAsync(order);
-        await _repository.SaveChangesAsync();
+        await _repOrder.AddAsync(order);
+        await _repOrder.SaveChangesAsync();
 
         return new OrderResponse
-        {
+        {     
             OrderNumber = order.OrderNumber,
+            EmailUser = _servCrUs.Email,
             SenderCity = order.SenderCity,
             SenderAddress = order.SenderAddress,
             ReceiverCity = order.ReceiverCity,
@@ -53,12 +62,14 @@ public class OrderService : IOrderService
     }
 
 
-    public async Task<List<OrderResponse>> GetAllAsync()
+    public async Task<PagedResponse<OrderResponse>> GetPagedSAsync(OrderQueryRequest request)
     {
-        var orders = await _repository.GetAllAsync();
-        return orders.Select(order => new OrderResponse
+        var result = await _repOrder.GetPagedAsync(request);
+
+        var orders = result.Items.Select(order => new OrderResponse
         {
             CreatedAt = order.CreatedAt, 
+            EmailUser = order.User.Email,
             OrderNumber = order.OrderNumber, 
             SenderCity = order.SenderCity,
             SenderAddress = order.SenderAddress,
@@ -67,21 +78,49 @@ public class OrderService : IOrderService
             CargoWeight = order.CargoWeight,
             CargoPickupDate = order.CargoPickupDate
         }).ToList();
+
+        return new PagedResponse<OrderResponse>
+        {
+            Items = orders,
+            Page = request.Page,
+            PageSize = request.PageSize,
+            TotalItems = result.TotalCount,
+            TotalPages = (int)Math.Ceiling(result.TotalCount / (double)request.PageSize)
+        };
     }
 
     private async Task<string> GenerateOrderNumberAsync()
     {
-        var prefix = $"DLV-{DateTime.UtcNow:yyyyMMdd}-";
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var nextNumber = await _repCount.GetNextNumberAsync(today);
+        
+        return $"DLV-{today:yyyyMMdd}-{nextNumber:D6}";
+    }
 
-        var lastOrderNumber = await _repository.GetLastOrderNumberAsync(prefix);
-        var nextNumber = 1;
+    public async Task<bool> DeleteAsync(string orderNumber)
+    {
+        var order = await _repOrder.GetByOrderNumberAsync(orderNumber);
+        if(order == null) { return false; }
 
-        if (!string.IsNullOrEmpty(lastOrderNumber))
-        {
-            var lastSequence = lastOrderNumber[prefix.Length..];
-            nextNumber = int.Parse(lastSequence) + 1;
-        }
+        _repOrder.Delete(order);
+        await _repOrder.SaveChangesAsync();
+            return true;
+    }
 
-        return $"DLV-{DateTime.UtcNow:yyyyMMdd}-{nextNumber:D6}";
+    public async Task<OrderResponse?> GetByOrderNumberAsync(string orderNumber)
+    {
+        var order = await _repOrder.GetByOrderNumberAsync(orderNumber);
+        if (order == null) { return null; }
+
+        return new OrderResponse
+        {   OrderNumber = order.OrderNumber,
+            EmailUser = order.User.Email,
+            CreatedAt = order.CreatedAt,
+            SenderCity = order.SenderCity,
+            SenderAddress = order.SenderAddress,
+            ReceiverCity = order.ReceiverCity,
+            ReceiverAddress = order.ReceiverAddress,
+            CargoWeight = order.CargoWeight,
+            CargoPickupDate = order.CargoPickupDate};
     }
 }

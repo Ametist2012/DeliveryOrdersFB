@@ -7,7 +7,7 @@ using DeliveryOrders.Validators;
 namespace DeliveryOrders.Controllers;
 
 [ApiController]
-[Route("api/admin")]
+[Route("api/[controller]")]
 public class AdminController : ControllerBase
 {
     private readonly AdminService _adminService;
@@ -21,7 +21,7 @@ public class AdminController : ControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("users")]
+    [HttpGet("Users")]
     public async Task<IActionResult> ListUsers()
     {
         var users = await _adminService.GetUsersAsync();
@@ -30,7 +30,7 @@ public class AdminController : ControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpDelete("users/{userId:guid}")]
+    [HttpDelete("Users/{UserId:guid}")]
     public async Task<IActionResult> DeleteUser(Guid userId)
     {
         var result = await _adminService.DelUserByIdAsync(userId);
@@ -46,7 +46,7 @@ public class AdminController : ControllerBase
 
 
     [Authorize(Roles = "Admin")]
-    [HttpPost("users")]
+    [HttpPost("Users")]
     public async Task<IActionResult> RegUser(AdminRegisterRequest request)
     {
         var errors = _validator.Validate(request);
@@ -68,4 +68,5 @@ public class AdminController : ControllerBase
         }
             return Ok(new {message = "User registered successfully"});
     }
+
 }

@@ -4,6 +4,7 @@ using DeliveryOrders.Models;
 using DeliveryOrders.Repositories.Interfaces;
 using System.Threading.Tasks;
 using DeliveryOrders.DTOs.Auth;
+using DeliveryOrders.DTOs;
 
 namespace DeliveryOrders.Services;
 
@@ -13,9 +14,16 @@ public class AdminService
     private readonly IUserRepository _userRepository;
     public AdminService(IUserRepository userRepository) { _userRepository = userRepository; }
 
-    public async Task<List<User>> GetUsersAsync()
+    public async Task<List<UserResponce>> GetUsersAsync()
     {
-        return await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetAllAsync();
+        return users.Select(i => new UserResponce
+                                    {
+                                        Id = i.Id,
+                                        Name = i.Name,
+                                        Email = i.Email,
+                                        Role = i.Role
+                                    }).ToList();
     }
 
 
