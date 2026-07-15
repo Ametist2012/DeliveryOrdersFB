@@ -103,6 +103,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AdminService>();
 
+builder.Services.AddScoped<IOrderCounterRepository, OrderCounterRepository>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 //JWT Авторизация
 var jwtKey = builder.Configuration.GetValue<string>("Jwt:Key");

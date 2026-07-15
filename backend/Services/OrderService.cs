@@ -3,16 +3,23 @@ using DeliveryOrders.Repositories;
 using DeliveryOrders.DTOs;
 using DeliveryOrders.Repositories.Interfaces;
 using DeliveryOrders.Services.Interfaces;
+using System.Security.Claims;
 
 namespace DeliveryOrders.Services;
 
 public class OrderService : IOrderService
 {
-    private readonly IOrderRepository _repository;
+    private readonly IOrderRepository _repOrder;
+    private readonly IOrderCounterRepository _repCount;
+    private readonly ICurrentUserService _servCrUs;
 
-    public OrderService(IOrderRepository repository)
+    public OrderService(IOrderRepository repOrder,
+                        IOrderCounterRepository repCount,
+                        ICurrentUserService servCrUs)
     {
-        _repository = repository;
+        _repOrder = repOrder;
+        _repCount = repCount;
+        _servCrUs = servCrUs;
     }
 
     private string Normalize(string value)
@@ -26,6 +33,7 @@ public class OrderService : IOrderService
         var order = new Order
         {
             Id = Guid.NewGuid(),
+            UserId = _servCrUs.UserId,
             CreatedAt = DateTime.UtcNow,
             OrderNumber = await GenerateOrderNumberAsync(),
             SenderCity = Normalize(request.SenderCity),
@@ -36,8 +44,8 @@ public class OrderService : IOrderService
             CargoPickupDate = request.CargoPickupDate
         };
        
-        await _repository.AddAsync(order);
-        await _repository.SaveChangesAsync();
+        await _repOrder.AddAsync(order);
+        await _repOrder.SaveChangesAsync();
 
         return new OrderResponse
         {
@@ -55,7 +63,7 @@ public class OrderService : IOrderService
 
     public async Task<List<OrderResponse>> GetAllAsync()
     {
-        var orders = await _repository.GetAllAsync();
+        var orders = await _repOrder.GetAllAsync();
         return orders.Select(order => new OrderResponse
         {
             CreatedAt = order.CreatedAt, 
@@ -71,17 +79,9 @@ public class OrderService : IOrderService
 
     private async Task<string> GenerateOrderNumberAsync()
     {
-        var prefix = $"DLV-{DateTime.UtcNow:yyyyMMdd}-";
-
-        var lastOrderNumber = await _repository.GetLastOrderNumberAsync(prefix);
-        var nextNumber = 1;
-
-        if (!string.IsNullOrEmpty(lastOrderNumber))
-        {
-            var lastSequence = lastOrderNumber[prefix.Length..];
-            nextNumber = int.Parse(lastSequence) + 1;
-        }
-
-        return $"DLV-{DateTime.UtcNow:yyyyMMdd}-{nextNumber:D6}";
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var nextNumber = await _repCount.GetNextNumberAsync(today);
+        
+        return $"DLV-{today:yyyyMMdd}-{nextNumber:D6}";
     }
 }

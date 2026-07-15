@@ -7,29 +7,29 @@ namespace DeliveryOrders.Repositories;
 
 public class OrderRepository : IOrderRepository
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _db;
 
-    public OrderRepository(AppDbContext context)
+    public OrderRepository(AppDbContext db)
     {
-        _context = context;
+        _db = db;
     }
 
 
     public async Task AddAsync(Order order)
     {
-        await _context.Orders.AddAsync(order);
+        await _db.Orders.AddAsync(order);
     }
 
 
     public async Task<Order?> GetByOrderNumberAsync(string orderNumber)
     {
-        return await _context.Orders
+        return await _db.Orders
             .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber);
     }
 
     public async Task<String?> GetLastOrderNumberAsync(string prefix)
     {
-        return await _context.Orders
+        return await _db.Orders
                     .Where(o => o.OrderNumber.StartsWith(prefix))
                     .OrderByDescending(o => o.OrderNumber)
                     .Select(o => o.OrderNumber)
@@ -38,7 +38,7 @@ public class OrderRepository : IOrderRepository
 
     public async Task<List<Order>> GetAllAsync()
     {
-        return await _context.Orders
+        return await _db.Orders
             .AsNoTracking()
             .ToListAsync();
     }
@@ -46,6 +46,6 @@ public class OrderRepository : IOrderRepository
 
     public async Task SaveChangesAsync()
     {
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
 }
