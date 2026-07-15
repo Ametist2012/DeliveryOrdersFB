@@ -1,32 +1,44 @@
 # **Delivery Orders**
 
-Веб-приложение для создания и просмотра заказов на доставку.
+Веб-приложение для управления заказами доставки.
 
-Проект состоит из:
+Проект представляет собой full-stack приложение, состоящее из:
 
 - **Backend** — ASP.NET Core Web API
 - **Frontend** — React + TypeScript
 - **Database** — PostgreSQL в Docker-контейнере
 
+Приложение позволяет пользователям регистрироваться, выполнять JWT-аутентификацию, создавать и просматривать заказы доставки, а также использовать функциональность в зависимости от роли пользователя.
+
 ---
 
-# **Технологии**
+# **Используемые технологии**
 
 ## **Backend**
 
-- ASP.NET Core Web API
+Используются:
+- ASP.NET Core Web API (.NET 9)
 - Entity Framework Core
 - PostgreSQL
 - Docker Compose
-- Swagger && OpenAPI
+- JWT Bearer Authentication
+- Role Based Authorization
+- Swagger / OpenAPI
+- Global Exception Handling Middleware
+
+---
 
 ## **Frontend**
 
-- React 19
+Используются:
+- React
 - TypeScript
 - Vite
 - Fetch API
-- Modern CSS (CSS Variables, Flexbox, Grid)
+- CSS Variables
+- Flexbox / Grid
+- History API Router
+- JWT Authentication
 
 ---
 
@@ -39,7 +51,7 @@
 - npm 24+
 - Docker Desktop
 
-Проверка версий:
+Проверка установленных версий:
 
 ```bash
 dotnet --version
@@ -52,7 +64,7 @@ docker --version
 
 # **Запуск проекта**
 
-## **1. Запуск PostgreSQL**
+## **1. Запуск базы данных**
 
 Перейдите в папку backend:
 
@@ -60,33 +72,29 @@ docker --version
 cd backend
 ```
 
-Запустите контейнер базы данных:
+Запустите PostgreSQL:
 
 ```bash
 docker compose up -d
 ```
 
-Проверить состояние контейнера:
+Проверка контейнера:
 
 ```bash
 docker ps
 ```
 
-Остановить контейнер:
+Остановка:
 
 ```bash
 docker compose down
 ```
 
+Данные базы сохраняются благодаря Docker Volume.
+
 ---
 
-# **2. Настройка Backend**
-
-Перейдите в папку backend:
-
-```bash
-cd backend
-```
+# **2. Запуск Backend**
 
 Установите зависимости:
 
@@ -94,7 +102,7 @@ cd backend
 dotnet restore
 ```
 
-Примените миграции базы данных:
+Примените миграции:
 
 ```bash
 dotnet ef database update
@@ -106,13 +114,15 @@ dotnet ef database update
 dotnet run
 ```
 
-После запуска Backend будет доступен:
+После запуска:
+
+API:
 
 ```
 http://localhost:5056
 ```
 
-Swagger UI:
+Swagger:
 
 ```
 http://localhost:5056/swagger
@@ -124,7 +134,7 @@ http://localhost:5056/swagger
 
 Откройте новый терминал.
 
-Перейдите в папку frontend:
+Перейдите в frontend:
 
 ```bash
 cd frontend
@@ -150,106 +160,11 @@ http://localhost:5173
 
 ---
 
-# **Основной функционал**
+# **База данных**
 
-Приложение позволяет:
+Используется PostgreSQL.
 
-- создавать новые заказы доставки;
-- автоматически получать номер заказа от сервера;
-- просматривать список созданных заказов;
-- открывать детальную информацию о заказе;
-- выполнять клиентскую и серверную валидацию данных;
-- отображать ошибки заполнения формы.
-
----
-
-# **API**
-
-Основные REST endpoints:
-
-## Authentication
-
-|**Метод**|**Endpoint**|**Назначение**|
-|---|---|---|
-| POST | `/api/auth/register` |Регистрация пользователя|
-| POST | `/api/auth/login` |Логин пользователя|
-
----
-
-## Orders
-
-|**Метод**|**Endpoint**|**Назначение**|
-|---|---|---|
-|GET|`/api/orders`|Получение списка заказов|
-|POST|`/api/orders`|Создание нового заказа|
-
----
-
-## Admin
-
-|**Метод**|**Endpoint**|**Назначение**|
-|---|---|---|
-| GET | `/api/admin/users` | Получить список всех пользователей |
-| POST | `/api/admin/users` | Добавить пользователя |
-| DELETE | `/api/admin/users/{id}` | Удалить пользователя |
-
----
-
-# **Команды разработки**
-
-## **Backend**
-
-Запуск:
-
-```bash
-dotnet run
-```
-
-Создание миграции:
-
-```bash
-dotnet ef migrations add MigrationName
-```
-
-Применение миграций:
-
-```bash
-dotnet ef database update
-```
-
----
-
-## **Frontend**
-
-Запуск:
-
-```bash
-npm run dev
-```
-
-Production сборка:
-
-```bash
-npm run build
-```
-
-Предпросмотр production:
-
-```bash
-npm run preview
-```
-
-Проверка качества кода:
-
-```bash
-npm run lint
-```
-
----
-
-# **Подключение к PostgreSQL**
-
-Настройки подключения находятся в:
+Конфигурация подключения:
 
 ```
 backend/appsettings.json
@@ -265,7 +180,7 @@ backend/appsettings.json
 }
 ```
 
-Параметры должны совпадать с настройками:
+Параметры должны совпадать с:
 
 ```
 backend/docker-compose.yml
@@ -273,9 +188,27 @@ backend/docker-compose.yml
 
 ---
 
-# **Проверка базы данных**
+# **Entity Framework Core**
 
-Подключение к PostgreSQL внутри контейнера:
+Основные команды:
+
+Создание миграции:
+
+```bash
+dotnet ef migrations add MigrationName
+```
+
+Применение миграций:
+
+```bash
+dotnet ef database update
+```
+
+---
+
+# **Подключение к PostgreSQL**
+
+Подключение внутри контейнера:
 
 ```bash
 docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
@@ -295,37 +228,290 @@ docker exec -it deliveryorders-postgres psql -U admin -d deliveryorders
 
 ---
 
-# **Полный порядок первого запуска**
+# **Аутентификация**
 
-После клонирования проекта:
+В приложении используется JWT Authentication.
 
-```bash
-cd DeliveryOrders/backend
+## **Регистрация**
 
-docker compose up -d
+Endpoint:
 
-dotnet restore
-
-dotnet ef database update
-
-dotnet run
+```
+POST /api/auth/register
 ```
 
-В новом терминале:
+Пример запроса:
 
-```bash
-cd DeliveryOrders/frontend
-
-npm install
-
-npm run dev
+```json
+{
+  "name": "Александр Иванов",
+  "email": "user@example.com",
+  "password": "Password123!"
+}
 ```
-
-После выполнения этих шагов приложение готово к работе.
 
 ---
 
-# 🛡 Exception Handling
+## **Авторизация**
+
+Endpoint:
+
+```
+POST /api/auth/login
+```
+
+Пример запроса:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+```
+
+Ответ:
+
+```json
+{
+  "token": "jwt_token"
+}
+```
+
+После получения токена необходимо передавать его в защищённых запросах:
+
+```http
+Authorization: Bearer TOKEN
+```
+
+---
+
+# **Пользовательские роли**
+
+В приложении реализована ролевая модель:
+
+- User
+- Admin
+
+---
+
+## **User**
+
+Пользователь может:
+- зарегистрироваться;
+- авторизоваться;
+- создавать заказы;
+- просматривать список заказов;
+- открывать детали заказа.
+
+---
+
+## **Admin**
+
+Администратор дополнительно может:
+- просматривать пользователей;
+- создавать пользователей;
+- управлять пользователями;
+- удалять заказы;
+- использовать административный раздел.
+
+---
+
+# **API**
+
+## **Authentication**
+
+|**Метод**|**Endpoint**|**Описание**|
+|---|---|---|
+|POST|`/api/auth/register`|Регистрация пользователя|
+|POST|`/api/auth/login`|Авторизация|
+
+---
+
+# **Orders**
+
+|**Метод**|**Endpoint**|**Доступ**|
+|---|---|---|
+|GET|`/api/orders`|User, Admin|
+|GET|`/api/orders/{orderNumber}`|User, Admin|
+|POST|`/api/orders`|User, Admin|
+|DELETE|`/api/orders/{orderNumber}`|Admin|
+
+---
+
+# **Получение списка заказов**
+
+Endpoint:
+
+```
+GET /api/orders
+```
+
+Поддерживаются:
+
+- пагинация;
+- сортировка;
+- получение email владельца заказа.
+
+Пример:
+
+```
+GET /api/orders?page=1&pageSize=10&sortBy=CreatedAt&direction=Desc
+```
+
+---
+
+## **Параметры сортировки**
+
+Доступные поля:
+
+```
+CreatedAt
+OrderNumber
+SenderCity
+SenderAddress
+ReceiverCity
+ReceiverAddress
+CargoWeight
+CargoPickupDate
+```
+
+Направления:
+
+```
+Asc
+Desc
+```
+
+---
+
+# **Пагинация**
+
+Пример ответа:
+
+```json
+{
+  "items": [],
+  "page": 1,
+  "pageSize": 10,
+  "totalItems": 100,
+  "totalPages": 10,
+  "hasNextPage": true
+}
+```
+
+---
+
+# **Создание заказа**
+
+Endpoint:
+
+```
+POST /api/orders
+```
+
+После создания номер заказа генерируется автоматически.
+
+Формат:
+
+```
+DLV-{Дата}-{Номер}
+```
+
+Пример:
+
+```
+DLV-20260715-000001
+```
+
+Особенности:
+
+- уникальный номер заказа;
+- ежедневная нумерация;
+- хранение счётчика в таблице OrderCounters.
+
+---
+
+# **Получение заказа**
+
+Endpoint:
+
+```
+GET /api/orders/{orderNumber}
+```
+
+Пример:
+
+```
+GET /api/orders/DLV-20260715-000001
+```
+
+---
+
+# **Удаление заказа**
+
+Endpoint:
+
+```
+DELETE /api/orders/{orderNumber}
+```
+
+Доступ:
+
+- Admin.
+
+Ответ:
+
+```json
+{
+  "message": "Order deleted successfully",
+  "orderNumber": "DLV-20260715-000001"
+}
+```
+
+---
+
+# **Admin API**
+
+|**Метод**|**Endpoint**|**Описание**|
+|---|---|---|
+|GET|`/api/admin/users`|Получение пользователей|
+|POST|`/api/admin/users`|Создание пользователя|
+|DELETE|`/api/admin/users/{id}`|Удаление пользователя|
+
+---
+
+# **Валидация**
+
+Реализована клиентская и серверная валидация.
+
+Проверяются:
+
+- обязательные поля;
+- формат email;
+- пароль;
+- длина строк;
+- диапазоны числовых значений;
+- вес груза;
+- дата забора груза.
+
+Пример ошибки:
+
+```json
+{
+  "errors": {
+    "CargoWeight": [
+      "The Cargo's weight must be between 0.01 and 100000 kg"
+    ]
+  },
+  "status":400
+}
+```
+
+Ошибки API отображаются пользователю в интерфейсе.
+
+---
+
+# **Обработка исключений**
 
 Добавлен глобальный middleware:
 
@@ -345,16 +531,112 @@ ExceptionHandlingMiddleware
 
 ---
 
-# 📌 Добавлено:
+# **Frontend маршруты**
 
-- JWT Аунтификация
-- Пользовательские роли для аунтификации (Admin, User)
-- Admin и User Менаджеры
-- Валидация данных для новых элементов API
-- Global Exception Handling  
- 
+Используется собственный роутер на основе History API.
+
+Доступные маршруты:
+
+```
+/orders
+```
+
+Список заказов.
+
+```
+/orders/new
+```
+
+Создание заказа.
+
+```
+/orders/{orderNumber}
+```
+
+Детальная информация заказа.
+
+```
+/admin
+```
+
+Административный раздел.
+
+```
+/admin/new
+```
+
+Создание пользователя администратором.
+
 ---
 
+# **Команды разработки**
 
+## **Backend**
 
+Запуск:
 
+```bash
+dotnet run
+```
+
+Миграции:
+
+```bash
+dotnet ef migrations add MigrationName
+
+dotnet ef database update
+```
+
+---
+
+## **Frontend**
+
+Запуск:
+
+```bash
+npm run dev
+```
+
+Production сборка:
+
+```bash
+npm run build
+```
+
+Предпросмотр:
+
+```bash
+npm run preview
+```
+
+---
+
+# **Production**
+
+Создание production версии frontend:
+
+```bash
+npm run build
+```
+
+Результат сборки:
+
+---
+
+# **Итог**
+
+**Delivery Orders** — полнофункциональное веб-приложение для управления заказами доставки.
+
+Реализовано:
+- JWT Authentication;
+- регистрация и авторизация пользователей;
+- роли User/Admin;
+- создание заказов;
+- просмотр заказов;
+- поиск заказа по номеру;
+- сортировка и пагинация;
+- административный раздел;
+- управление пользователями;
+- клиентская и серверная валидация;
+- обработка ошибок API;
+- интеграция React + ASP.NET Core Web API + PostgreSQL.
