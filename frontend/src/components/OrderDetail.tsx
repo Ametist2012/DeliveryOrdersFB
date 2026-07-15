@@ -43,6 +43,18 @@ export default function OrderDetail({ order, onBack }: { order: Order; onBack: (
             <div className="detail-fact-value">{formatDate(order.cargoPickupDate)}</div>
           </div>
         </div>
+
+        <div className="detail-solid" />
+        <div className="detail-facts">
+          <div>
+            <div className="detail-fact-label">Оформил</div>
+            <div className="detail-fact-value detail-fact-value--mono-sm">{order.emailUser}</div>
+          </div>
+          <div>
+            <div className="detail-fact-label">Дата создания</div>
+            <div className="detail-fact-value detail-fact-value--mono-sm">{formatDate(order.createdAt)}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

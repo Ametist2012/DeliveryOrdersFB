@@ -9,12 +9,17 @@ type View = "list" | "create";
 
 interface AdminSectionProps {
   view: View;
-  onViewChange: (view: View) => void;
+  onNavigateList: () => void;
   onCountChange: (count: number) => void;
 }
 
-export default function AdminSection({ view, onViewChange, onCountChange }: AdminSectionProps) {
+export default function AdminSection({
+  view,
+  onNavigateList,
+  onCountChange,
+}: AdminSectionProps) {
   const { token, logout } = useAuth();
+
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -23,70 +28,103 @@ export default function AdminSection({ view, onViewChange, onCountChange }: Admi
 
   const load = useCallback(() => {
     if (!token) return;
+
     setLoading(true);
     setLoadError(null);
+
     listUsers(token)
       .then((data) => {
         setUsers(data);
-        onCountChange(data.length);
       })
       .catch((err) => {
         if (err instanceof AuthExpiredError) {
           logout();
           return;
         }
-        setLoadError(err instanceof Error ? err.message : "Не удалось загрузить список пользователей");
+
+        setLoadError(
+          err instanceof Error
+            ? err.message
+            : "Не удалось загрузить список пользователей"
+        );
       })
       .finally(() => setLoading(false));
-  }, [token, logout, onCountChange]);
+  }, [token, logout]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  useEffect(() => {
+    onCountChange(users.length);
+  }, [users.length, onCountChange]);
+
   const handleDelete = async (user: AdminUser) => {
     if (!token) return;
-    if (!window.confirm(`Удалить пользователя «${user.name}» (${user.email})?`)) return;
+
+    if (!window.confirm(`Удалить пользователя «${user.name}» (${user.email})?`)) {
+      return;
+    }
 
     setDeletingId(user.id);
     setActionError(null);
+
     try {
       await deleteUser(user.id, token);
-      setUsers((prev) => {
-        const next = prev.filter((u) => u.id !== user.id);
-        onCountChange(next.length);
-        return next;
-      });
+
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
     } catch (err) {
       if (err instanceof AuthExpiredError) {
         logout();
         return;
       }
-      setActionError(err instanceof Error ? err.message : "Не удалось удалить пользователя");
+
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Не удалось удалить пользователя"
+      );
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleCreated = () => {
-    onViewChange("list");
+    onNavigateList();
     load();
   };
 
   return (
     <>
-      {view === "create" && <AdminUserForm onCreated={handleCreated} onCancel={() => onViewChange("list")} />}
+      {view === "create" && (
+        <AdminUserForm
+          onCreated={handleCreated}
+          onCancel={onNavigateList}
+        />
+      )}
 
       {view === "list" && (
         <>
-          {actionError && <div className="status-banner status-banner--error">{actionError}</div>}
+          {actionError && (
+            <div className="status-banner status-banner--error">
+              {actionError}
+            </div>
+          )}
 
-          {loading && <div className="status-banner--loading">Загружаем пользователей…</div>}
+          {loading && (
+            <div className="status-banner--loading">
+              Загружаем пользователей…
+            </div>
+          )}
 
           {!loading && loadError && (
             <div className="status-banner status-banner--error">
               {loadError}{" "}
-              <button className="link-back" style={{ display: "inline", marginLeft: 8 }} onClick={load}>
+              <button
+                className="link-back"
+                style={{ display: "inline", marginLeft: 8 }}
+                onClick={load}
+              >
                 Повторить
               </button>
             </div>
@@ -106,6 +144,7 @@ export default function AdminSection({ view, onViewChange, onCountChange }: Admi
                 <span>Роль</span>
                 <span />
               </div>
+
               {users.map((u) => (
                 <AdminUserRow
                   key={u.id}

@@ -1,5 +1,23 @@
 import OrderRow from "./OrderRow";
-import type { Order } from "../api/ordersApi";
+import Pager from "./Pager";
+import type { Order, OrderSortField, SortDirection } from "../api/ordersApi";
+
+interface SortableHeaderProps {
+  field: OrderSortField;
+  label: string;
+  sortBy: OrderSortField;
+  direction: SortDirection;
+  onSortChange: (field: OrderSortField) => void;
+}
+
+function SortableHeader({ field, label, sortBy, direction, onSortChange }: SortableHeaderProps) {
+  return (
+    <button className="sort-header" onClick={() => onSortChange(field)}>
+      {label}
+      {sortBy === field && <span className="sort-arrow">{direction === "Asc" ? "▲" : "▼"}</span>}
+    </button>
+  );
+}
 
 interface OrderListProps {
   orders: Order[];
@@ -7,9 +25,39 @@ interface OrderListProps {
   error: string | null;
   onOpen: (order: Order) => void;
   onRetry: () => void;
+  sortBy: OrderSortField;
+  direction: SortDirection;
+  onSortChange: (field: OrderSortField) => void;
+  canDelete: boolean;
+  onDelete: (order: Order) => void;
+  deletingNumber: string | null;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  onPageChange: (page: number) => void;
+  pageSize: number;
+  onPageSizeChange: (size: number) => void;
 }
 
-export default function OrderList({ orders, loading, error, onOpen, onRetry }: OrderListProps) {
+export default function OrderList({
+  orders,
+  loading,
+  error,
+  onOpen,
+  onRetry,
+  sortBy,
+  direction,
+  onSortChange,
+  canDelete,
+  onDelete,
+  deletingNumber,
+  page,
+  totalPages,
+  hasNextPage,
+  onPageChange,
+  pageSize,
+  onPageSizeChange,
+}: OrderListProps) {
   if (loading) {
     return <div className="status-banner--loading">Загружаем заказы…</div>;
   }
@@ -35,17 +83,37 @@ export default function OrderList({ orders, loading, error, onOpen, onRetry }: O
   }
 
   return (
-    <div className="file-list">
-      <div className="file-list-head">
-        <span>№ заказа</span>
-        <span>Маршрут</span>
-        <span>Вес</span>
-        <span>Забор</span>
-        <span aria-hidden="true" />
+    <>
+      <div className="file-list">
+        <div className="file-list-head">
+          <SortableHeader field="OrderNumber" label="№ заказа" sortBy={sortBy} direction={direction} onSortChange={onSortChange} />
+          <SortableHeader field="SenderCity" label="Маршрут" sortBy={sortBy} direction={direction} onSortChange={onSortChange} />
+          <span>Email</span>
+          <SortableHeader field="CargoWeight" label="Вес" sortBy={sortBy} direction={direction} onSortChange={onSortChange} />
+          <SortableHeader field="CargoPickupDate" label="Забор" sortBy={sortBy} direction={direction} onSortChange={onSortChange} />
+          <span />
+          <span />
+        </div>
+        {orders.map((o) => (
+          <OrderRow
+            key={o.orderNumber}
+            order={o}
+            onOpen={() => onOpen(o)}
+            canDelete={canDelete}
+            onDelete={() => onDelete(o)}
+            deleting={deletingNumber === o.orderNumber}
+          />
+        ))}
       </div>
-      {orders.map((o) => (
-        <OrderRow key={o.orderNumber} order={o} onClick={() => onOpen(o)} />
-      ))}
-    </div>
+
+      <Pager
+        page={page}
+        totalPages={totalPages}
+        hasNextPage={hasNextPage}
+        onPageChange={onPageChange}
+        pageSize={pageSize}
+        onPageSizeChange={onPageSizeChange}
+      />
+    </>
   );
 }
