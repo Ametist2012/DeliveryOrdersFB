@@ -13,7 +13,7 @@ public class AdminService
     private readonly IUserRepository _userRepository;
     public AdminService(IUserRepository userRepository) { _userRepository = userRepository; }
 
-    public async Task<List<User>> GetUsersAsync()
+    public async Task<List<UserResponce>> GetUsersAsync()
     {
         return await _userRepository.GetAllAsync();
     }

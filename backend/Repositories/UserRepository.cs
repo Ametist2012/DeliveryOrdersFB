@@ -40,17 +40,30 @@ public class UserRepository : IUserRepository
     }
 
     // получить всех пользователей
-    public async Task<List<User>> GetAllAsync()
+    public async Task<List<UserResponce>> GetAllAsync()
     {
-        return _db.Users.ToList();
+        return await _db.Users
+                    .Select(i => new UserResponce
+                    {
+                        Id = i.Id,
+                        Name = i.Name,
+                        Email = i.Email,
+                        Role = i.Role
+                    }).ToListAsync();
     }
 
     // только админы
-    public async Task<List<User>> GetAdminsAsync()
+    public async Task<List<UserResponce>> GetAdminsAsync()
     {
-        return _db.Users
-            .Where(u => u.Role == Role.Admin.ToString())
-            .ToList();
+        return await _db.Users
+                    .Where(i => i.Role == Role.Admin.ToString())
+                    .Select(u => new UserResponce
+                    {
+                        Id = u.Id,
+                        Name = u.Name,
+                        Email = u.Email,
+                        Role = u.Role
+                    }).ToListAsync();
     }
 
     // добавить пользователя
