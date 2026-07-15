@@ -53,7 +53,7 @@ public class OrderRepository : IOrderRepository
                     .FirstOrDefaultAsync();
     }
 
-    public async Task<List<Order>> GetAllAsync(OrderQueryRequest request)
+    public async Task<List<Order>> GetAllSortAsync(OrderQueryRequest request)
     {
         IQueryable<Order> query = _db.Orders;
         query = ApplySorting(query, request);

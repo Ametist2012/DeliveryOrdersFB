@@ -7,5 +7,5 @@ namespace DeliveryOrders.Services.Interfaces;
 public interface IOrderService
 {
     Task<OrderResponse> CreateAsync(CreateOrderRequest request);
-    Task<List<OrderResponse>> GetAllAsync();
+    Task<List<OrderResponse>> GetAllSortSAsync(OrderQueryRequest request);
 }

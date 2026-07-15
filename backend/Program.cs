@@ -8,6 +8,7 @@ using DeliveryOrders.Services;
 using DeliveryOrders.Validators.Interfaces;
 using DeliveryOrders.Middleware;
 using DeliveryOrders.Validators;
+using System.Text.Json.Serialization;
 
 using DeliveryOrders.Repositories.Interfaces;
 using DeliveryOrders.Services.Interfaces;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IOrderValidator, OrderValidator>();
 builder.Services.AddScoped<IAdminRegisterValidator, AdminRegisterValidator>();
 builder.Services.AddScoped<IUserRegisterValidator, UserRegisterValidator>();
 builder.Services.AddScoped<IUserLoginValidator, UserLoginValidator>();
+builder.Services.AddScoped<IOrderQueryValidator, OrderQueryValidator>();
 
 
 builder.Services.AddControllers();
@@ -107,6 +109,13 @@ builder.Services.AddScoped<IOrderCounterRepository, OrderCounterRepository>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+//swagger Enum
+builder.Services.AddControllers().AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter());
+                });
 
 //JWT Авторизация
 var jwtKey = builder.Configuration.GetValue<string>("Jwt:Key");

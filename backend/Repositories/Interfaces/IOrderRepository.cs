@@ -7,6 +7,6 @@ public interface IOrderRepository
 {
     Task AddAsync(Order order);             
     Task<Order?> GetByOrderNumberAsync(string orderNumber); 
-    Task<List<Order>> GetAllAsync(OrderQueryRequest request);
+    Task<List<Order>> GetAllSortAsync(OrderQueryRequest request);
     Task SaveChangesAsync();
 }

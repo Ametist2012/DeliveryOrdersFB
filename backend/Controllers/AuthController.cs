@@ -10,7 +10,7 @@ namespace DeliveryOrders.Controllers;
 
 
 [ApiController]
-[Route("api/auth")]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly AuthService _authService;
@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
 
 
     [AllowAnonymous] //Доступны без авторизации
-    [HttpPost("register")]
+    [HttpPost("Register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
         var errors = _validator.Validate(request);
@@ -52,7 +52,7 @@ public class AuthController : ControllerBase
 
 
     [AllowAnonymous] 
-    [HttpPost("login")]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var errors = _loginValidator.Validate(request);

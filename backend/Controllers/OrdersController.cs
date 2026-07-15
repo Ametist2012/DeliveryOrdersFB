@@ -14,11 +14,15 @@ public class OrdersController : ControllerBase
 {
     private readonly IOrderService _service;
     private readonly IOrderValidator _validator;
+    private readonly IOrderQueryValidator _validatorGet;
 
-    public OrdersController(IOrderService service, IOrderValidator validator)
+    public OrdersController(IOrderService service, 
+                            IOrderValidator validator,
+                            IOrderQueryValidator validatorGet)
     {
         _service = service;
         _validator = validator;
+        _validatorGet = validatorGet;
     }
 
 
@@ -28,26 +32,30 @@ public class OrdersController : ControllerBase
         var errors = _validator.Validate(request);
 
         if (errors.Count > 0)
-        {
-            foreach (var error in errors)
-            {   
-                foreach (var message in error.Value) { ModelState.AddModelError(error.Key, message); }
-            }
-
-            return ValidationProblem(ModelState);
+        {   foreach (var error in errors)
+                {   foreach (var message in error.Value) { ModelState.AddModelError(error.Key, message); } }
+            
+            return ValidationProblem(ModelState); 
         }
 
         var order = await _service.CreateAsync(request);
-
         return Ok(order);
     }
 
 
     [HttpGet]
-    public async Task<ActionResult<List<OrderResponse>>> GetAll()
+    public async Task<ActionResult<List<OrderResponse>>> GetSortAll([FromQuery] OrderQueryRequest request)
     {
-        var orders = await _service.GetAllAsync();
+        var errors = _validatorGet.Validate(request);
 
+        if (errors.Count > 0)
+        {   foreach (var error in errors)
+                {   foreach (var message in error.Value) { ModelState.AddModelError(error.Key, message); } }
+            
+            return ValidationProblem(ModelState); 
+        }
+
+        var orders = await _service.GetAllSortSAsync(request);
         return Ok(orders);
     }
 }

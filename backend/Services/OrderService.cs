@@ -61,9 +61,9 @@ public class OrderService : IOrderService
     }
 
 
-    public async Task<List<OrderResponse>> GetAllAsync()
+    public async Task<List<OrderResponse>> GetAllSortSAsync(OrderQueryRequest request)
     {
-        var orders = await _repOrder.GetAllAsync();
+        var orders = await _repOrder.GetAllSortAsync(request);
         return orders.Select(order => new OrderResponse
         {
             CreatedAt = order.CreatedAt, 
