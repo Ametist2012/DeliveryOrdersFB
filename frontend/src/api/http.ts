@@ -1,5 +1,3 @@
-// Общая инфраструктура запросов: разбор ValidationProblemDetails / Problem от ASP.NET,
-// перевод сообщений на русский, заголовок авторизации. Используется и заказами, и auth.
 
 export const API_ROOT = "/api";
 
@@ -12,7 +10,6 @@ export class ValidationError extends Error {
   }
 }
 
-// Бросается при 401 — токен просрочен/невалиден. 
 export class AuthExpiredError extends Error {}
 
 const MESSAGE_TRANSLATIONS: Record<string, string> = {
@@ -53,8 +50,6 @@ const MESSAGE_TRANSLATIONS: Record<string, string> = {
 
   "Invalid email or password.": "Неверный email или пароль",
   "A user with this email already exists.": "Пользователь с таким email уже существует",
-
-  
 };
 
 export function translateMessage(message: string): string {
@@ -78,7 +73,9 @@ export function buildValidationError(
     const translated = translateMessage(Array.isArray(messages) ? messages[0] : String(messages));
     if (mapped) {
       fieldErrors[mapped] = translated;
-    } else { unmapped.push(translated); }
+    } else {
+      unmapped.push(translated);
+    }
   });
   const message = unmapped.length
     ? `Проверьте правильность заполнения формы. ${unmapped.join(" ")}`
@@ -86,9 +83,6 @@ export function buildValidationError(
   return new ValidationError(message, fieldErrors);
 }
 
-// Разбирает 400-ответ, который может быть как ValidationProblemDetails (с errors —
-// например, из OrdersController), так и обычным Problem(title, detail) без errors
-// (например, "A user with this email already exists." из AuthController/AdminController).
 export async function parseBadRequest(res: Response, fieldMap: Record<string, string>): Promise<Error> {
   const problem: ProblemDetails | null = await res.json().catch(() => null);
   if (problem?.errors) return buildValidationError(problem, fieldMap);

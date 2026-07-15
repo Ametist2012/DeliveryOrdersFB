@@ -32,9 +32,7 @@ export default function OrderForm({ onCreated, onCancel }: OrderFormProps) {
     }
   };
 
-  // Проверка "поле не пустое" плюс дублирование бизнес-правил из OrderValidator.cs
-  // (диапазон веса, число знаков после запятой, дата не в прошлом) — чтобы ошибка
-  // была видна сразу, а не только после ответа сервера.
+
   const validateRequired = () => {
     const errs: Partial<Record<keyof CreateOrderPayload, string>> = {};
     (Object.keys(emptyForm) as (keyof CreateOrderPayload)[]).forEach((k) => {

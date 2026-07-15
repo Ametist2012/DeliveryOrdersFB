@@ -16,6 +16,7 @@ export interface CreateUserPayload {
   role: string;
 }
 
+// Ключи ValidationProblemDetails — имена свойств AdminRegisterRequest (Name, Email, Password, Role).
 const FIELD_MAP: Record<string, keyof CreateUserPayload> = {
   name: "name",
   email: "email",
@@ -23,11 +24,11 @@ const FIELD_MAP: Record<string, keyof CreateUserPayload> = {
   role: "role",
 };
 
-
+// 401 — токен истёк/невалиден (разлогиниваем). 403 — токен валиден, но роль не Admin
+// (в норме сюда не попадаем, т.к. UI скрыт для не-админов, но на всякий случай не разлогиниваем,
+// а показываем сообщение).
 function checkAuth(res: Response) {
-  // 401 — токен истёк/невалиден (разлогиниваем).
   if (res.status === 401) throw new AuthExpiredError("Сессия истекла, войдите снова");
-  // 403 — токен валиден, но роль не Admin (не разлогиниваем, показываем сообщение)
   if (res.status === 403) throw new Error("Недостаточно прав для этого действия.");
 }
 
